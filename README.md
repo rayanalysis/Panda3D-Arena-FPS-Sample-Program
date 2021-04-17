@@ -20,3 +20,7 @@ Included Full Assets:
 Game Goal:
 - Neutralize the NPC by shooting the head hitbox
 - Receive success message
+
+Requirements: 
+- Panda3D
+- panda3d-simplepbr-gltf

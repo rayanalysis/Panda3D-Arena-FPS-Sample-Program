@@ -3,7 +3,7 @@ This is a modern Panda3D sample program with an Arena first person shooter envir
 
 Features:
 - First person shooter basic environment
-- Physically based shaders based on panda3d-simplepbr
+- Physically based shaders via panda3d-simplepbr
 - Hardware Skinning support via custom actor shaders
 - Bullet Physics integration of environment and characters
 - Advanced timing logic in Panda3D
@@ -11,10 +11,10 @@ Features:
 - State machine based onscreen text updating
 - Toggle based flashlight with shadow casting
 
-Included Assets:
-- Handgun model
-- Adult male model
-- Arena model
+Included Full Assets:
+- Handgun model with Blender file
+- Adult male model with Blender file and .bam animation exports
+- Arena model with Blender file
 
 Game Goal:
 - Neutralize the NPC by shooting the head hitbox

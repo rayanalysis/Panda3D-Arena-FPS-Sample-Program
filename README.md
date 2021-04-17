@@ -5,8 +5,17 @@ Features:
 - First person shooter basic environment
 - Physically based shaders based on panda3d-simplepbr
 - Hardware Skinning support via custom actor shaders
-- Bullet Physics integration of non-player characters
+- Bullet Physics integration of environment and characters
 - Advanced timing logic in Panda3D
 - Basic weapon loading and procedural animations
-- Onscreen text updating
+- State machine based onscreen text updating
 - Toggle based flashlight with shadow casting
+
+Included Assets:
+- Handgun model
+- Adult male model
+- Arena model
+
+Game Goal:
+- Neutralize the NPC by shooting the head hitbox
+- Receive success message

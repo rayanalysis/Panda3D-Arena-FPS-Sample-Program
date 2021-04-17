@@ -3,11 +3,12 @@ This is a modern Panda3D sample program with an Arena first person shooter envir
 
 Features:
 - First person shooter basic environment
+- First person camera handling system
 - Physically based shaders via panda3d-simplepbr
-- Hardware Skinning support via custom actor shaders
+- Hardware Skinning support via customized actor shaders
 - Bullet Physics integration of environment and characters
 - Advanced timing logic in Panda3D
-- Basic weapon loading and procedural animations
+- Basic weapon loading and procedural animation
 - State machine based onscreen text updating
 - Toggle based flashlight with shadow casting
 

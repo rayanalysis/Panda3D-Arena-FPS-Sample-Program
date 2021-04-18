@@ -4,6 +4,8 @@ This is a modern Panda3D sample program with an Arena first person shooter envir
 Features:
 - First person shooter basic environment
 - First person camera handling system
+- Interactive target reticule system
+- "walking" and "death" animations included
 - Physically based shaders via panda3d-simplepbr
 - Hardware Skinning support via customized actor shaders
 - Bullet Physics integration of environment and characters

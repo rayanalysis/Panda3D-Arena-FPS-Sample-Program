@@ -265,8 +265,7 @@ class app(ShowBase):
                 self.render.setLightOff(self.slight)
                 self.flashlight_state = 0
 
-        za = DirectObject()
-        za.accept('f', toggle_flashlight)
+        beep.accept('f', toggle_flashlight)
         
         # NPC_1 load-in
         compShape2 = BulletCapsuleShape(0.05, 0.01, ZUp)
@@ -395,8 +394,7 @@ class app(ShowBase):
                     rigid_target = self.render.find('**/d_coll_A')
                     self.world.remove(rigid_target.node())
                             
-        npc_1_op = DirectObject()
-        npc_1_op.accept('mouse1', is_npc_1_shot)                    
+        beep.accept('mouse1', is_npc_1_shot)                    
         
         # 3D player movement system begins
         self.keyMap = {"left": 0, "right": 0, "forward": 0, "backward": 0, "run": 0, "jump": 0}
@@ -597,8 +595,7 @@ class app(ShowBase):
             else:
                 debugNP.hide()
 
-        o = DirectObject()
-        o.accept('f1', toggleDebug)
+        beep.accept('f1', toggleDebug)
 
         def update(Task):
             if self.game_start < 1:

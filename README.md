@@ -7,7 +7,7 @@ Features:
 - Interactive target reticule system
 - "walking" and "death" animations included
 - Physically based shaders via panda3d-simplepbr
-- Hardware Skinning support via customized actor shaders
+- Hardware Skinning support via customized Actor shaders
 - Bullet Physics integration of environment and characters
 - Advanced timing logic in Panda3D
 - Basic weapon loading and procedural animation

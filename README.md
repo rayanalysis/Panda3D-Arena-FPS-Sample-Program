@@ -5,9 +5,8 @@ Features:
 - First person shooter basic environment
 - First person camera handling system
 - Interactive target dot reticule system
-- Armature with "walking" and "death" animations included
-- Procedural NPC movement system
-- Working blend2bam Actor exporting script included
+- Armature with "walking" and "death" animations
+- Working blend2bam Actor exporting script
 - Physically based shaders via panda3d-simplepbr
 - Hardware Skinning support via customized Actor shaders
 - Bullet Physics integration of environment and characters
@@ -16,6 +15,7 @@ Features:
 - State machine based onscreen text updating
 - Toggle based flashlight with shadow casting
 - Modern .gltf and .bam based modeling
+- Very basic NPC movement system 
 
 Included Full Assets:
 - Handgun model with Blender file

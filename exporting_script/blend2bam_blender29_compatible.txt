@@ -1,0 +1,2 @@
+blend2bam -m pbr --pipeline gltf --animations separate npc_1_death_anim.blend npc_1.bam
+

@@ -68,6 +68,7 @@ class app(ShowBase):
             gl-depth-zero-to-one true
             interpolate-frames 1
             clock-frame-rate 60
+            hardware-animated-vertices #t
             fullscreen #f
         """)
 

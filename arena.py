@@ -328,14 +328,19 @@ class app(ShowBase):
         # npc movement timer
         def npc_1_move_gen():
             while not self.npc_1_is_dead:
-                self.npc_1_move_increment[0] = 0.05
-                self.npc_1_move_increment[1] = 0.1
+                m_incs = []
+                for x in range(0, 2):
+                    m_incs.append(random.uniform(0.03, 0.08))
+                
+                print('NPC_1 movement increments this cycle: ' + str(m_incs))
+                self.npc_1_move_increment[0] = m_incs[0]
+                self.npc_1_move_increment[1] = m_incs[1]
                 time.sleep(3)
-                self.npc_1_move_increment[0] = 0.1
-                self.npc_1_move_increment[1] = 0.05
-                time.sleep(4)
-                self.npc_1_move_increment[0] = -0.1
-                self.npc_1_move_increment[1] = -0.1
+                self.npc_1_move_increment[0] = m_incs[0]
+                self.npc_1_move_increment[1] = m_incs[1]
+                time.sleep(3)
+                self.npc_1_move_increment[0] = (-1 * m_incs[0]) * 2
+                self.npc_1_move_increment[1] = (-1 * m_incs[1]) * 2
                 time.sleep(3)
                 self.npc_1_move_increment[0] = 0
                 self.npc_1_move_increment[1] = 0

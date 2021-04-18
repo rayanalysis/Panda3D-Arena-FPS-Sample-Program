@@ -13,6 +13,7 @@ Features:
 - Basic weapon loading and procedural animation
 - State machine based onscreen text updating
 - Toggle based flashlight with shadow casting
+- 100% modern .gltf and .bam based modeling
 
 Included Full Assets:
 - Handgun model with Blender file

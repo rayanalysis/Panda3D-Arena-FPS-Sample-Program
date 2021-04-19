@@ -65,10 +65,9 @@ class app(ShowBase):
             framebuffer-srgb #t
             view-frustum-cull 0
             textures-power-2 none
+            hardware-animated-vertices #t
             gl-depth-zero-to-one true
             interpolate-frames 1
-            clock-frame-rate 60
-            hardware-animated-vertices #t
             fullscreen #f
         """)
 
@@ -98,9 +97,6 @@ class app(ShowBase):
 
         self.accept("f3", self.toggleWireframe)
         self.accept("escape", sys.exit, [0])
-
-        self.camLens.set_fov(85)
-        self.camLens.setFocalLength(7)
 
         self.game_start = 0
         
@@ -234,8 +230,7 @@ class app(ShowBase):
         def print_player_pos():
             print(self.player.getPos())
 
-        beep = DirectObject()
-        beep.accept('mouse1', print_player_pos)
+        self.accept('mouse1', print_player_pos)
 
         self.flashlight_state = 0
 
@@ -246,7 +241,7 @@ class app(ShowBase):
                 if len(current_flashlight) == 0:
                     self.slight = 0
                     self.slight = Spotlight('flashlight')
-                    self.slight.setShadowCaster(True, 512, 512)
+                    # self.slight.setShadowCaster(True, 512, 512)
                     self.slight.setColor(VBase4(0.5, 0.6, 0.6, 1))  # slightly bluish
                     lens = PerspectiveLens()
                     lens.setNearFar(0.005, 5000)
@@ -266,7 +261,7 @@ class app(ShowBase):
                 self.render.setLightOff(self.slight)
                 self.flashlight_state = 0
 
-        beep.accept('f', toggle_flashlight)
+        self.accept('f', toggle_flashlight)
         
         # NPC_1 load-in
         compShape2 = BulletCapsuleShape(0.05, 0.01, ZUp)
@@ -288,7 +283,7 @@ class app(ShowBase):
         npc_1_control = actorData.NPC_1.getAnimControl('walking')
         if not npc_1_control.isPlaying():
             actorData.NPC_1.stop()
-            actorData.NPC_1.loop("walking")
+            actorData.NPC_1.loop("walking", fromFrame = 60, toFrame = 180)
             actorData.NPC_1.setPlayRate(6.0, 'walking')
         
         # create special hit areas
@@ -331,7 +326,7 @@ class app(ShowBase):
             while not self.npc_1_is_dead:
                 m_incs = []
                 for x in range(0, 2):
-                    m_incs.append(random.uniform(0.03, 0.08))
+                    m_incs.append(random.uniform(1, 5))
                 
                 print('NPC_1 movement increments this cycle: ' + str(m_incs))
                 self.npc_1_move_increment[0] = m_incs[0]
@@ -400,7 +395,7 @@ class app(ShowBase):
                     rigid_target = self.render.find('**/d_coll_A')
                     self.world.remove(rigid_target.node())
                             
-        beep.accept('mouse1', is_npc_1_shot)                    
+        self.accept('mouse1', is_npc_1_shot)                    
         
         # 3D player movement system begins
         self.keyMap = {"left": 0, "right": 0, "forward": 0, "backward": 0, "run": 0, "jump": 0}
@@ -444,7 +439,8 @@ class app(ShowBase):
                     actorData.NPC_1.lookAt(self.player)
                     npc_1_head.lookAt(self.player)
                     m_inst = self.npc_1_move_increment
-                    actorData.NPC_1.getParent().setPos(npc_pos_1[0] + m_inst[0], npc_pos_1[1] + m_inst[1], npc_pos_1[2])
+                    t_inst = globalClock.getDt()
+                    actorData.NPC_1.getParent().setPos(npc_pos_1[0] + (m_inst[0] * t_inst), npc_pos_1[1] + (m_inst[1] * t_inst), npc_pos_1[2])
                     
                 if self.npc_1_is_dead:
                     npc_1_head.hide()
@@ -601,7 +597,7 @@ class app(ShowBase):
             else:
                 debugNP.hide()
 
-        beep.accept('f1', toggleDebug)
+        self.accept('f1', toggleDebug)
 
         def update(Task):
             if self.game_start < 1:

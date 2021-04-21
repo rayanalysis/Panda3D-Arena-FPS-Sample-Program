@@ -53,7 +53,7 @@ from panda3d.core import TextNode
 import simplepbr
 import gltf
 # local imports
-import actorData
+import actor_data
 
 
 class app(ShowBase):
@@ -78,22 +78,22 @@ class app(ShowBase):
         gltf.patch_loader(self.loader)
         
         props = WindowProperties()
-        props.setMouseMode(WindowProperties.M_relative)
-        base.win.requestProperties(props)
+        props.set_mouse_mode(WindowProperties.M_relative)
+        base.win.request_properties(props)
         
         self.camLens.set_fov(80)
         self.camLens.set_near_far(0.01, 90000)
-        self.camLens.setFocalLength(7)
-        # self.camera.setPos(0, 0, 2)
+        self.camLens.set_focal_length(7)
+        # self.camera.set_pos(0, 0, 2)
 
-        # plight generator
+        # point light generator
         for x in range(0, 4):
             plight_1 = PointLight('plight')
             # add plight props here
-            plight_1_node = self.render.attachNewNode(plight_1)
+            plight_1_node = self.render.attach_new_node(plight_1)
             # group the lights close to each other to create a sun effect
-            plight_1_node.setPos(random.uniform(-20, -21), random.uniform(-20, -21), random.uniform(20, 21))
-            self.render.setLight(plight_1_node)
+            plight_1_node.set_pos(random.uniform(-20, -21), random.uniform(-20, -21), random.uniform(20, 21))
+            self.render.set_light(plight_1_node)
 
         self.accept("f3", self.toggleWireframe)
         self.accept("escape", sys.exit, [0])
@@ -112,39 +112,39 @@ class app(ShowBase):
         from panda3d.bullet import BulletRigidBodyNode
 
         self.world = BulletWorld()
-        self.world.setGravity(Vec3(0, 0, -9.81))
+        self.world.set_gravity(Vec3(0, 0, -9.81))
         
-        arena_1 = self.loader.loadModel('models/arena_1.gltf')
-        arena_1.reparentTo(self.render)
-        arena_1.setPos(0, 0, 0)
+        arena_1 = self.loader.load_model('models/arena_1.gltf')
+        arena_1.reparent_to(self.render)
+        arena_1.set_pos(0, 0, 0)
         
         def make_collision_from_model(input_model, node_number, mass, world, target_pos):
             # tristrip generation from static models
             # generic tri-strip collision generator begins
-            geom_nodes = input_model.findAllMatches('**/+GeomNode')
-            geom_nodes = geom_nodes.getPath(node_number).node()
+            geom_nodes = input_model.find_all_matches('**/+GeomNode')
+            geom_nodes = geom_nodes.get_path(node_number).node()
             # print(geom_nodes)
-            geom_target = geom_nodes.getGeom(0)
+            geom_target = geom_nodes.get_geom(0)
             # print(geom_target)
             output_bullet_mesh = BulletTriangleMesh()
-            output_bullet_mesh.addGeom(geom_target)
+            output_bullet_mesh.add_geom(geom_target)
             tri_shape = BulletTriangleMeshShape(output_bullet_mesh, dynamic=False)
             print(output_bullet_mesh)
 
             body = BulletRigidBodyNode('input_model_tri_mesh')
-            np = self.render.attachNewNode(body)
-            np.node().addShape(tri_shape)
-            np.node().setMass(mass)
-            np.node().setFriction(0.01)
-            np.setPos(target_pos)
-            np.setScale(1)
-            # np.setH(180)
-            # np.setR(180)
-            # np.setP(180)
-            np.setCollideMask(BitMask32.allOn())
-            world.attachRigidBody(np.node())
+            np = self.render.attach_new_node(body)
+            np.node().add_shape(tri_shape)
+            np.node().set_mass(mass)
+            np.node().set_friction(0.01)
+            np.set_pos(target_pos)
+            np.set_scale(1)
+            # np.set_h(180)
+            # np.set_r(180)
+            # np.set_p(180)
+            np.set_collide_mask(BitMask32.allOn())
+            world.attach_rigid_body(np.node())
         
-        make_collision_from_model(arena_1, 0, 0, self.world, (arena_1.getPos()))
+        make_collision_from_model(arena_1, 0, 0, self.world, (arena_1.get_pos()))
 
         # prototype hardware shader for Actor nodes
         actor_shader = Shader.load(Shader.SL_GLSL, "shaders/simplepbr_vert_mod_1.vert", "shaders/simplepbr_frag_mod_1.frag")
@@ -152,169 +152,168 @@ class app(ShowBase):
         actor_shader = actor_shader.setFlag(ShaderAttrib.F_hardware_skinning, True)
 
         # initialize player character physics the Bullet way
-        shape1 = BulletCapsuleShape(0.1, 0.5, ZUp)
-        playerNode = BulletCharacterControllerNode(shape1, 50, 'Player')  # (shape, mass, player name)
-        playerNP = self.render.attachNewNode(playerNode)
-        playerNP.setPos(-20, -10, 30)
-        playerNP.setCollideMask(BitMask32.allOn())
-        self.world.attachCharacter(playerNP.node())
-        # cast playerNP to self.player
-        self.player = playerNP
-        
-        #############################################
-        # reparent player character to render node
-        fpCharacter = actorData.player_character
-        fpCharacter.reparent_to(self.render)
-        fpCharacter.setScale(1)
-        # set the actor skinning hardware shader
-        fpCharacter.setAttrib(actor_shader)
+        shape_1 = BulletCapsuleShape(0.1, 0.5, ZUp)
+        player_node = BulletCharacterControllerNode(shape_1, 50, 'Player')  # (shape, mass, player name)
+        player_np = self.render.attach_new_node(player_node)
+        player_np.set_pos(-20, -10, 30)
+        player_np.set_collide_mask(BitMask32.allOn())
+        self.world.attach_character(player_np.node())
+        # cast player_np to self.player
+        self.player = player_np
 
-        self.camera.reparentTo(self.player)
+        # reparent player character to render node
+        fp_character = actor_data.player_character
+        fp_character.reparent_to(self.render)
+        fp_character.set_scale(1)
+        # set the actor skinning hardware shader
+        fp_character.set_attrib(actor_shader)
+
+        self.camera.reparent_to(self.player)
         # reparent character to FPS cam
-        fpCharacter.reparentTo(self.player)
-        fpCharacter.setPos(0, 0, -0.4)
-        # self.camera.setX(self.player, 1)
-        self.camera.setY(self.player, 0.03)
-        self.camera.setZ(self.player, 1.1)
+        fp_character.reparent_to(self.player)
+        fp_character.set_pos(0, 0, -0.4)
+        # self.camera.set_x(self.player, 1)
+        self.camera.set_y(self.player, 0.03)
+        self.camera.set_z(self.player, 1.1)
         
         # player gun begins
-        self.player_gun = self.loader.loadModel('models/handgun_1.gltf')
-        self.player_gun.reparentTo(self.render)
-        self.player_gun.reparentTo(self.camera)
-        self.player_gun.setX(self.camera, 0.1)
-        self.player_gun.setY(self.camera, 0.4)
-        self.player_gun.setZ(self.camera, -0.1)
+        self.player_gun = self.loader.load_model('models/handgun_1.gltf')
+        self.player_gun.reparent_to(self.render)
+        self.player_gun.reparent_to(self.camera)
+        self.player_gun.set_x(self.camera, 0.1)
+        self.player_gun.set_y(self.camera, 0.4)
+        self.player_gun.set_z(self.camera, -0.1)
         
         # directly make a text node to display text
         text_1 = TextNode('text_1_node')
-        text_1.setText("")
-        text_1_node = aspect2d.attachNewNode(text_1)
-        text_1_node.setScale(0.05)
-        text_1_node.setPos(-1.4, 0, 0.92)
+        text_1.set_text("")
+        text_1_node = self.aspect2d.attach_new_node(text_1)
+        text_1_node.set_scale(0.05)
+        text_1_node.set_pos(-1.4, 0, 0.92)
         # import font and set pixels per unit font quality
-        nunito_font = loader.loadFont('fonts/Nunito/Nunito-Light.ttf')
-        nunito_font.setPixelsPerUnit(100)
-        nunito_font.setPageSize(512, 512)
+        nunito_font = loader.load_font('fonts/Nunito/Nunito-Light.ttf')
+        nunito_font.set_pixels_per_unit(100)
+        nunito_font.set_page_size(512, 512)
         # apply font
-        text_1.setFont(nunito_font)
+        text_1.set_font(nunito_font)
         # small caps
-        # text_1.setSmallCaps(True)
+        # text_1.set_small_caps(True)
 
         # on-screen target dot for aiming
         target_dot = TextNode('target_dot_node')
-        target_dot.setText(".")
-        target_dot_node = aspect2d.attachNewNode(target_dot)
-        target_dot_node.setScale(0.075)
-        target_dot_node.setPos(0, 0, 0)
+        target_dot.set_text(".")
+        target_dot_node = self.aspect2d.attach_new_node(target_dot)
+        target_dot_node.set_scale(0.075)
+        target_dot_node.set_pos(0, 0, 0)
         # target_dot_node.hide()
         # apply font
-        target_dot.setFont(nunito_font)
-        target_dot.setAlign(TextNode.ACenter)
+        target_dot.set_font(nunito_font)
+        target_dot.set_align(TextNode.ACenter)
         # see the Task section for relevant dot update logic
         
         # directly make a text node to display text
         text_2 = TextNode('text_2_node')
-        text_2.setText("Neutralize the NPC by shooting the head." + '\n' + "Press 'f' to activate the flashlight.")
-        text_2_node = aspect2d.attachNewNode(text_2)
-        text_2_node.setScale(0.04)
-        text_2_node.setPos(-1.4, 0, 0.8)
+        text_2.set_text("Neutralize the NPC by shooting the head." + '\n' + "Press 'f' to activate the flashlight.")
+        text_2_node = self.aspect2d.attach_new_node(text_2)
+        text_2_node.set_scale(0.04)
+        text_2_node.set_pos(-1.4, 0, 0.8)
         # import font and set pixels per unit font quality
-        nunito_font = loader.loadFont('fonts/Nunito/Nunito-Light.ttf')
-        nunito_font.setPixelsPerUnit(100)
-        nunito_font.setPageSize(512, 512)
+        nunito_font = loader.load_font('fonts/Nunito/Nunito-Light.ttf')
+        nunito_font.set_pixels_per_unit(100)
+        nunito_font.set_page_size(512, 512)
         # apply font
-        text_2.setFont(nunito_font)
-        text_2.setTextColor(0, 0.3, 1, 1)
+        text_2.set_font(nunito_font)
+        text_2.set_text_color(0, 0.3, 1, 1)
         
         # print player position on mouse click
         def print_player_pos():
-            print(self.player.getPos())
+            print(self.player.get_pos())
 
         self.accept('mouse1', print_player_pos)
 
         self.flashlight_state = 0
 
         def toggle_flashlight():
-            current_flashlight = self.render.findAllMatches("**/flashlight")
+            current_flashlight = self.render.find_all_matches("**/flashlight")
 
             if self.flashlight_state == 0:
                 if len(current_flashlight) == 0:
                     self.slight = 0
                     self.slight = Spotlight('flashlight')
                     # self.slight.setShadowCaster(True, 512, 512)
-                    self.slight.setColor(VBase4(0.5, 0.6, 0.6, 1))  # slightly bluish
+                    self.slight.set_color(VBase4(0.5, 0.6, 0.6, 1))  # slightly bluish
                     lens = PerspectiveLens()
-                    lens.setNearFar(0.005, 5000)
-                    self.slight.setLens(lens)
-                    self.slight.setAttenuation((0.5, 0, 0.0000005))
-                    self.slight = self.render.attachNewNode(self.slight)
-                    self.slight.setPos(-0.1, 0.2, -0.4)
-                    self.slight.reparentTo(self.camera)
+                    lens.set_near_far(0.005, 5000)
+                    self.slight.set_lens(lens)
+                    self.slight.set_attenuation((0.5, 0, 0.0000005))
+                    self.slight = self.render.attach_new_node(self.slight)
+                    self.slight.set_pos(-0.1, 0.2, -0.4)
+                    self.slight.reparent_to(self.camera)
                     self.flashlight_state = 1
-                    self.render.setLight(self.slight)
+                    self.render.set_light(self.slight)
 
                 elif len(current_flashlight) > 0:
-                    self.render.setLight(self.slight)
+                    self.render.set_light(self.slight)
                     self.flashlight_state = 1
 
             elif self.flashlight_state > 0:
-                self.render.setLightOff(self.slight)
+                self.render.set_light_off(self.slight)
                 self.flashlight_state = 0
 
         self.accept('f', toggle_flashlight)
         
         # NPC_1 load-in
-        compShape2 = BulletCapsuleShape(0.05, 0.01, ZUp)
-        npc_Node = BulletCharacterControllerNode(compShape2, 0.2, 'NPC_A_node')  # (shape, mass, character name)
-        np = self.render.attachNewNode(npc_Node)
-        np.setPos(-40, -40, 5)
-        np.setCollideMask(BitMask32.allOn())
-        self.world.attachCharacter(np.node())
-        np.setH(random.randint(0, 180))
-        npc_model_1 = actorData.NPC_1
-        npc_model_1.reparentTo(np)
+        comp_shape_1 = BulletCapsuleShape(0.05, 0.01, ZUp)
+        npc_1_node = BulletCharacterControllerNode(comp_shape_1, 0.2, 'NPC_A_node')  # (shape, mass, character name)
+        np = self.render.attach_new_node(npc_1_node)
+        np.set_pos(-40, -40, 5)
+        np.set_collide_mask(BitMask32.allOn())
+        self.world.attach_character(np.node())
+        np.set_h(random.randint(0, 180))
+        npc_model_1 = actor_data.NPC_1
+        npc_model_1.reparent_to(np)
         # set the actor skinning hardware shader
-        npc_model_1.setAttrib(actor_shader)
+        npc_model_1.set_attrib(actor_shader)
         # get the separate head model
-        npc_1_head = self.loader.loadModel('models/npc_1_head.gltf')
-        npc_1_head.reparentTo(actorData.NPC_1.getParent())
+        npc_1_head = self.loader.load_model('models/npc_1_head.gltf')
+        npc_1_head.reparent_to(actor_data.NPC_1.get_parent())
         
         # npc base animation loop
-        npc_1_control = actorData.NPC_1.getAnimControl('walking')
-        if not npc_1_control.isPlaying():
-            actorData.NPC_1.stop()
-            actorData.NPC_1.loop("walking", fromFrame = 60, toFrame = 180)
-            actorData.NPC_1.setPlayRate(6.0, 'walking')
+        npc_1_control = actor_data.NPC_1.get_anim_control('walking')
+        if not npc_1_control.is_playing():
+            actor_data.NPC_1.stop()
+            actor_data.NPC_1.loop("walking", fromFrame = 60, toFrame = 180)
+            actor_data.NPC_1.set_play_rate(6.0, 'walking')
         
         # create special hit areas
         # use Task section for npc collision movement logic
         # special head node size
-        specialShape = BulletBoxShape(Vec3(0.1, 0.1, 0.1))
+        special_shape = BulletBoxShape(Vec3(0.1, 0.1, 0.1))
         # ghost npc node
-        body = BulletGhostNode('specialNode_A')
-        specialNode = self.render.attachNewNode(body)
-        specialNode.node().addShape(specialShape, TransformState.makePos(Point3(0, 0, 0.4)))
-        # specialNode.node().setMass(0)
-        # specialNode.node().setFriction(0.5)
-        specialNode.setCollideMask(BitMask32(0x0f))
+        body = BulletGhostNode('special_node_A')
+        special_node = self.render.attach_new_node(body)
+        special_node.node().add_shape(special_shape, TransformState.makePos(Point3(0, 0, 0.4)))
+        # special_node.node().set_mass(0)
+        # special_node.node().set_friction(0.5)
+        special_node.set_collide_mask(BitMask32(0x0f))
         # turn on Continuous Collision Detection
-        specialNode.node().setCcdMotionThreshold(0.000000007)
-        specialNode.node().setCcdSweptSphereRadius(0.30)
-        self.world.attachGhost(specialNode.node())
+        special_node.node().set_ccd_motion_threshold(0.000000007)
+        special_node.node().set_ccd_swept_sphere_radius(0.30)
+        self.world.attach_ghost(special_node.node())
         
         # dynamic collision
-        specialShape = BulletBoxShape(Vec3(0.2, 0.1, 0.6))
+        special_shape = BulletBoxShape(Vec3(0.2, 0.1, 0.6))
         # rigidbody npc node
         body = BulletRigidBodyNode('d_coll_A')
-        d_coll = self.render.attachNewNode(body)
-        d_coll.node().addShape(specialShape, TransformState.makePos(Point3(0, 0, 0.7)))
-        # d_coll.node().setMass(0)
-        d_coll.node().setFriction(0.5)
-        d_coll.setCollideMask(BitMask32(0x0f))
+        d_coll = self.render.attach_new_node(body)
+        d_coll.node().add_shape(special_shape, TransformState.makePos(Point3(0, 0, 0.7)))
+        # d_coll.node().set_mass(0)
+        d_coll.node().set_friction(0.5)
+        d_coll.set_collide_mask(BitMask32(0x0f))
         # turn on Continuous Collision Detection
-        d_coll.node().setCcdMotionThreshold(0.000000007)
-        d_coll.node().setCcdSweptSphereRadius(0.30)
-        self.world.attachRigidBody(d_coll.node())
+        d_coll.node().set_ccd_motion_threshold(0.000000007)
+        d_coll.node().set_ccd_swept_sphere_radius(0.30)
+        self.world.attach_rigid_body(d_coll.node())
         
         # npc state variables
         self.npc_1_is_dead = False
@@ -355,8 +354,8 @@ class app(ShowBase):
                     
                 lf_end = LerpFunc(end_gun_anim, fromData=2.5, toData=4, duration=0)
                 
-                gun_pos = self.player_gun.getPos()
-                gun_hpr = self.player_gun.getHpr()
+                gun_pos = self.player_gun.get_pos()
+                gun_hpr = self.player_gun.get_hpr()
                 gun_anim_1 = LerpPosHprInterval(self.player_gun, 0.05, (gun_pos[0] + 0.01, gun_pos[1] + 0.01, gun_pos[2] + 0.01), (gun_hpr[0], gun_hpr[1] + 10, gun_hpr[2]))
                 gun_anim_2 = LerpPosHprInterval(self.player_gun, 0.1, (gun_pos), (gun_hpr))
                 ga_list = Sequence()
@@ -368,27 +367,27 @@ class app(ShowBase):
             # target dot ray test
             # get mouse data
             mouse_watch = base.mouseWatcherNode
-            if mouse_watch.hasMouse():
-                posMouse = base.mouseWatcherNode.getMouse()
+            if mouse_watch.has_mouse():
+                posMouse = base.mouseWatcherNode.get_mouse()
                 posFrom = Point3()
                 posTo = Point3()
                 base.camLens.extrude(posMouse, posFrom, posTo)
-                posFrom = render.getRelativePoint(base.cam, posFrom)
-                posTo = render.getRelativePoint(base.cam, posTo)
-                rayTest = self.world.rayTestClosest(posFrom, posTo)
-                target = rayTest.getNode()
-                target_dot = self.aspect2d.findAllMatches("**/target_dot_node")
+                posFrom = self.render.get_relative_point(base.cam, posFrom)
+                posTo = self.render.get_relative_point(base.cam, posTo)
+                rayTest = self.world.ray_test_closest(posFrom, posTo)
+                target = rayTest.get_node()
+                target_dot = self.aspect2d.find_all_matches("**/target_dot_node")
 
-                if 'specialNode_A' in str(target):
+                if 'special_node_A' in str(target):
                     # the head is hit, the npc is dead
                     self.npc_1_is_dead = True
-                    text_2.setText('Congrats, you have won!')
-                    npc_1_control = actorData.NPC_1.getAnimControl('walking')
-                    if npc_1_control.isPlaying():
-                        actorData.NPC_1.stop()
-                    npc_1_control = actorData.NPC_1.getAnimControl('death')
-                    if not npc_1_control.isPlaying():
-                        actorData.NPC_1.play('death')
+                    text_2.set_text('Congrats, you have won!')
+                    npc_1_control = actor_data.NPC_1.get_anim_control('walking')
+                    if npc_1_control.is_playing():
+                        actor_data.NPC_1.stop()
+                    npc_1_control = actor_data.NPC_1.get_anim_control('death')
+                    if not npc_1_control.is_playing():
+                        actor_data.NPC_1.play('death')
                         
                     # Bullet node removals
                     self.world.remove(target)
@@ -417,7 +416,7 @@ class app(ShowBase):
         self.accept("space", setKey, ["jump", 1])
         self.accept("space-up", setKey, ["jump", 0])
         # disable mouse
-        self.disableMouse()
+        self.disable_mouse()
 
         # the player movement speed
         self.movementSpeedForward = 2.5
@@ -428,19 +427,19 @@ class app(ShowBase):
         def move(Task):
             if self.game_start > 0:
                 if not self.npc_1_is_dead:
-                    npc_pos_1 = actorData.NPC_1.getParent().getPos()
+                    npc_pos_1 = actor_data.NPC_1.get_parent().get_pos()
                     # place head hit box
-                    specialNode.setPos(npc_pos_1[0], npc_pos_1[1], npc_pos_1[2] + 1)
-                    specialNode.setH(actorData.NPC_1.getH())
+                    special_node.set_pos(npc_pos_1[0], npc_pos_1[1], npc_pos_1[2] + 1)
+                    special_node.set_h(actor_data.NPC_1.get_h())
                     # dynamic collision node
-                    d_coll.setPos(npc_pos_1[0], npc_pos_1[1], npc_pos_1[2])
-                    d_coll.setH(actorData.NPC_1.getH())
+                    d_coll.set_pos(npc_pos_1[0], npc_pos_1[1], npc_pos_1[2])
+                    d_coll.set_h(actor_data.NPC_1.get_h())
                     # make the npc look at the player continuously
-                    actorData.NPC_1.lookAt(self.player)
-                    npc_1_head.lookAt(self.player)
+                    actor_data.NPC_1.look_at(self.player)
+                    npc_1_head.look_at(self.player)
                     m_inst = self.npc_1_move_increment
-                    t_inst = globalClock.getDt()
-                    actorData.NPC_1.getParent().setPos(npc_pos_1[0] + (m_inst[0] * t_inst), npc_pos_1[1] + (m_inst[1] * t_inst), npc_pos_1[2])
+                    t_inst = globalClock.get_dt()
+                    actor_data.NPC_1.get_parent().set_pos(npc_pos_1[0] + (m_inst[0] * t_inst), npc_pos_1[1] + (m_inst[1] * t_inst), npc_pos_1[2])
                     
                 if self.npc_1_is_dead:
                     npc_1_head.hide()
@@ -449,43 +448,43 @@ class app(ShowBase):
                 # turns the target dot red
                 # get mouse data
                 mouse_watch = base.mouseWatcherNode
-                if mouse_watch.hasMouse():
-                    posMouse = base.mouseWatcherNode.getMouse()
+                if mouse_watch.has_mouse():
+                    posMouse = base.mouseWatcherNode.get_mouse()
                     posFrom = Point3()
                     posTo = Point3()
                     base.camLens.extrude(posMouse, posFrom, posTo)
-                    posFrom = render.getRelativePoint(base.cam, posFrom)
-                    posTo = render.getRelativePoint(base.cam, posTo)
-                    rayTest = self.world.rayTestClosest(posFrom, posTo)
-                    target = rayTest.getNode()
-                    target_dot = self.aspect2d.findAllMatches("**/target_dot_node")
+                    posFrom = self.render.get_relative_point(base.cam, posFrom)
+                    posTo = self.render.get_relative_point(base.cam, posTo)
+                    rayTest = self.world.ray_test_closest(posFrom, posTo)
+                    target = rayTest.get_node()
+                    target_dot = self.aspect2d.find_all_matches("**/target_dot_node")
 
-                    if 'specialNode_A' in str(target):
+                    if 'special_node_A' in str(target):
                         # the npc is recognized, make the dot red
                         for dot in target_dot:
-                            dot.node().setTextColor(0.9, 0.1, 0.1, 1)
+                            dot.node().set_text_color(0.9, 0.1, 0.1, 1)
                             
                     if 'd_coll_A' in str(target):
                         # the npc is recognized, make the dot red
                         for dot in target_dot:
-                            dot.node().setTextColor(0.9, 0.1, 0.1, 1)
+                            dot.node().set_text_color(0.9, 0.1, 0.1, 1)
                     
-                    if 'specialNode_A' not in str(target):
+                    if 'special_node_A' not in str(target):
                         # no npc recognized, make the dot white
                         if 'd_coll_A' not in str(target):
                             for dot in target_dot:
-                                dot.node().setTextColor(1, 1, 1, 1)
+                                dot.node().set_text_color(1, 1, 1, 1)
                             
                 # get mouse data
                 mouse_watch = base.mouseWatcherNode
-                if mouse_watch.hasMouse():
-                    pointer = base.win.getPointer(0)
-                    mouseX = pointer.getX()
-                    mouseY = pointer.getY()
+                if mouse_watch.has_mouse():
+                    pointer = base.win.get_pointer(0)
+                    mouseX = pointer.get_x()
+                    mouseY = pointer.get_y()
                     
                 # screen sizes
-                window_Xcoord_halved = base.win.getXSize() // 2
-                window_Ycoord_halved = base.win.getYSize() // 2
+                window_Xcoord_halved = base.win.get_x_size() // 2
+                window_Ycoord_halved = base.win.get_y_size() // 2
                 # mouse speed
                 mouseSpeedX = 0.2
                 mouseSpeedY = 0.2
@@ -498,9 +497,9 @@ class app(ShowBase):
                 if base.win.movePointer(0, window_Xcoord_halved, window_Ycoord_halved):
                     p = 0
 
-                    if mouse_watch.hasMouse():
+                    if mouse_watch.has_mouse():
                         # calculate the pitch of camera
-                        p = camera.getP() - (mouseY - window_Ycoord_halved) * mouseSpeedY
+                        p = self.camera.get_p() - (mouseY - window_Ycoord_halved) * mouseSpeedY
 
                     # sanity checking
                     if p < minPitch:
@@ -508,16 +507,16 @@ class app(ShowBase):
                     elif p > maxPitch:
                         p = maxPitch
 
-                    if mouse_watch.hasMouse():
+                    if mouse_watch.has_mouse():
                         # directly set the camera pitch
-                        camera.setP(p)
-                        camViewTarget.setY(p)
+                        self.camera.set_p(p)
+                        camViewTarget.set_y(p)
 
                     # rotate the self.player's heading according to the mouse x-axis movement
-                    if mouse_watch.hasMouse():
-                        h = self.player.getH() - (mouseX - window_Xcoord_halved) * mouseSpeedX
+                    if mouse_watch.has_mouse():
+                        h = self.player.get_h() - (mouseX - window_Xcoord_halved) * mouseSpeedX
 
-                    if mouse_watch.hasMouse():
+                    if mouse_watch.has_mouse():
                         # sanity checking
                         if h < -360:
                             h += 360
@@ -525,8 +524,8 @@ class app(ShowBase):
                         elif h > 360:
                             h -= 360
 
-                        self.player.setH(h)
-                        camViewTarget.setX(h)
+                        self.player.set_h(h)
+                        camViewTarget.set_x(h)
                         
                     # hide the gun if looking straight down
                     if p < -30:
@@ -535,36 +534,36 @@ class app(ShowBase):
                         self.player_gun.show()
 
                 if self.keyMap["left"]:
-                    self.player.setX(self.player, -self.striveSpeed * globalClock.getDt())
+                    self.player.setX(self.player, -self.striveSpeed * globalClock.get_dt())
 
                 if self.keyMap["right"]:
-                    self.player.setX(self.player, self.striveSpeed * globalClock.getDt())
+                    self.player.setX(self.player, self.striveSpeed * globalClock.get_dt())
 
                 if self.keyMap["forward"]:
-                    self.player.setY(self.player, self.movementSpeedForward * globalClock.getDt())
+                    self.player.setY(self.player, self.movementSpeedForward * globalClock.get_dt())
                     
-                    myAnimControl = actorData.player_character.getAnimControl('walking')
+                    myAnimControl = actor_data.player_character.getAnimControl('walking')
                     if not myAnimControl.isPlaying():
-                        actorData.player_character.play("walking")
-                        actorData.player_character.setPlayRate(4.0, 'walking')
+                        actor_data.player_character.play("walking")
+                        actor_data.player_character.set_play_rate(4.0, 'walking')
                     
                 if self.keyMap["forward"] != 1:
-                    walkControl = actorData.player_character.getAnimControl('walking')
+                    walkControl = actor_data.player_character.getAnimControl('walking')
                     walkControl.stop()
                     
                 if self.keyMap["backward"]:
-                    self.player.setY(self.player, -self.movementSpeedBackward * globalClock.getDt())
+                    self.player.setY(self.player, -self.movementSpeedBackward * globalClock.get_dt())
                     '''
-                    myBackControl = actorData.player_character.getAnimControl('backWalk')
+                    myBackControl = actor_data.player_character.getAnimControl('backWalk')
                     if not myBackControl.isPlaying():
                         myBackControl.stop()
-                        actorData.player_character.play('backWalk')
-                        actorData.player_character.setPlayRate(-1.0, 'backWalk')
+                        actor_data.player_character.play('backWalk')
+                        actor_data.player_character.set_play_rate(-1.0, 'backWalk')
                     '''
                 if self.keyMap["backward"] != 1:
                     pass
                     '''
-                    walkControl = actorData.player_character.getAnimControl('backWalk')
+                    walkControl = actor_data.player_character.getAnimControl('backWalk')
                     walkControl.stop()
                     '''
             return Task.cont
@@ -574,25 +573,25 @@ class app(ShowBase):
         from panda3d.bullet import BulletRigidBodyNode
         ground_plane = BulletPlaneShape(Vec3(0, 0, 1), 0)
         node = BulletRigidBodyNode('ground')
-        node.addShape(ground_plane)
-        node.setFriction(0.1)
-        np = self.render.attachNewNode(node)
-        np.setPos(0, 0, -1)
-        self.world.attachRigidBody(node)
+        node.add_shape(ground_plane)
+        node.set_friction(0.1)
+        np = self.render.attach_new_node(node)
+        np.set_pos(0, 0, -1)
+        self.world.attach_rigid_body(node)
 
         # Bullet debugger
         from panda3d.bullet import BulletDebugNode
         debugNode = BulletDebugNode('Debug')
-        debugNode.showWireframe(True)
-        debugNode.showConstraints(True)
-        debugNode.showBoundingBoxes(False)
-        debugNode.showNormals(False)
-        debugNP = self.render.attachNewNode(debugNode)
-        self.world.setDebugNode(debugNP.node())
+        debugNode.show_wireframe(True)
+        debugNode.show_constraints(True)
+        debugNode.show_bounding_boxes(False)
+        debugNode.show_normals(False)
+        debugNP = self.render.attach_new_node(debugNode)
+        self.world.set_debug_node(debugNP.node())
 
         # debug toggle function
         def toggleDebug():
-            if debugNP.isHidden():
+            if debugNP.is_hidden():
                 debugNP.show()
             else:
                 debugNP.hide()
@@ -605,8 +604,8 @@ class app(ShowBase):
             return Task.cont
 
         def physics_update(Task):
-            dt = globalClock.getDt()
-            self.world.doPhysics(dt)
+            dt = globalClock.get_dt()
+            self.world.do_physics(dt)
             return Task.cont
 
         self.task_mgr.add(move)

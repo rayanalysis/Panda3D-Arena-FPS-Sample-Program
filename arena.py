@@ -39,6 +39,7 @@ from panda3d.core import Shader, ShaderAttrib
 from panda3d.core import TransformState
 from panda3d.core import Spotlight
 from panda3d.core import PerspectiveLens
+from panda3d.core import ConfigVariableManager
 import sys
 import random
 import time
@@ -85,6 +86,8 @@ class app(ShowBase):
         self.camLens.set_near_far(0.01, 90000)
         self.camLens.set_focal_length(7)
         # self.camera.set_pos(0, 0, 2)
+        
+        # ConfigVariableManager.getGlobalPtr().listVariables()
 
         # point light generator
         for x in range(0, 4):
@@ -110,6 +113,7 @@ class app(ShowBase):
         from panda3d.bullet import BulletBoxShape
         from panda3d.bullet import BulletGhostNode
         from panda3d.bullet import BulletRigidBodyNode
+        from panda3d.bullet import BulletPlaneShape
 
         self.world = BulletWorld()
         self.world.set_gravity(Vec3(0, 0, -9.81))
@@ -139,8 +143,8 @@ class app(ShowBase):
             np.set_pos(target_pos)
             np.set_scale(1)
             # np.set_h(180)
-            # np.set_r(180)
             # np.set_p(180)
+            # np.set_r(180)
             np.set_collide_mask(BitMask32.allOn())
             world.attach_rigid_body(np.node())
         
@@ -152,8 +156,8 @@ class app(ShowBase):
         actor_shader = actor_shader.setFlag(ShaderAttrib.F_hardware_skinning, True)
 
         # initialize player character physics the Bullet way
-        shape_1 = BulletCapsuleShape(0.1, 0.5, ZUp)
-        player_node = BulletCharacterControllerNode(shape_1, 50, 'Player')  # (shape, mass, player name)
+        shape_1 = BulletCapsuleShape(0.75, 0.5, ZUp)
+        player_node = BulletCharacterControllerNode(shape_1, 5, 'Player')  # (shape, mass, player name)
         player_np = self.render.attach_new_node(player_node)
         player_np.set_pos(-20, -10, 30)
         player_np.set_collide_mask(BitMask32.allOn())
@@ -171,10 +175,10 @@ class app(ShowBase):
         self.camera.reparent_to(self.player)
         # reparent character to FPS cam
         fp_character.reparent_to(self.player)
-        fp_character.set_pos(0, 0, -0.4)
+        fp_character.set_pos(0, 0, -0.95)
         # self.camera.set_x(self.player, 1)
         self.camera.set_y(self.player, 0.03)
-        self.camera.set_z(self.player, 1.1)
+        self.camera.set_z(self.player, 0.5)
         
         # player gun begins
         self.player_gun = self.loader.load_model('models/handgun_1.gltf')
@@ -262,6 +266,29 @@ class app(ShowBase):
 
         self.accept('f', toggle_flashlight)
         
+        # add a few random physics boxes
+        for x in range(0, 20):
+            # dynamic collision
+            random_vec = Vec3(1, 1, 1)
+            special_shape = BulletBoxShape(random_vec)
+            # rigidbody
+            body = BulletRigidBodyNode('random_prisms')
+            d_coll = self.render.attach_new_node(body)
+            d_coll.node().add_shape(special_shape)
+            d_coll.node().set_mass(0.9)
+            d_coll.node().set_friction(0.5)
+            d_coll.set_collide_mask(BitMask32.allOn())
+            # turn on Continuous Collision Detection
+            d_coll.node().set_ccd_motion_threshold(0.000000007)
+            d_coll.node().set_ccd_swept_sphere_radius(0.30)
+            d_coll.node().set_deactivation_enabled(False)
+            d_coll.set_pos(random.uniform(-60, -20), random.uniform(-60, -20), random.uniform(5, 10))
+            box_model = self.loader.loadModel('models/1m_cube.gltf')
+            box_model.reparent_to(self.render)
+            box_model.reparent_to(d_coll)
+            box_model.set_color(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
+            self.world.attach_rigid_body(d_coll.node())
+        
         # NPC_1 load-in
         comp_shape_1 = BulletCapsuleShape(0.05, 0.01, ZUp)
         npc_1_node = BulletCharacterControllerNode(comp_shape_1, 0.2, 'NPC_A_node')  # (shape, mass, character name)
@@ -297,20 +324,22 @@ class app(ShowBase):
         # special_node.node().set_friction(0.5)
         special_node.set_collide_mask(BitMask32(0x0f))
         # turn on Continuous Collision Detection
+        special_node.node().set_deactivation_enabled(False)
         special_node.node().set_ccd_motion_threshold(0.000000007)
         special_node.node().set_ccd_swept_sphere_radius(0.30)
         self.world.attach_ghost(special_node.node())
         
         # dynamic collision
-        special_shape = BulletBoxShape(Vec3(0.2, 0.1, 0.6))
+        special_shape = BulletBoxShape(Vec3(0.3, 0.15, 0.6))
         # rigidbody npc node
         body = BulletRigidBodyNode('d_coll_A')
         d_coll = self.render.attach_new_node(body)
         d_coll.node().add_shape(special_shape, TransformState.makePos(Point3(0, 0, 0.7)))
         # d_coll.node().set_mass(0)
         d_coll.node().set_friction(0.5)
-        d_coll.set_collide_mask(BitMask32(0x0f))
+        d_coll.set_collide_mask(BitMask32.allOn())
         # turn on Continuous Collision Detection
+        d_coll.node().set_deactivation_enabled(False)
         d_coll.node().set_ccd_motion_threshold(0.000000007)
         d_coll.node().set_ccd_swept_sphere_radius(0.30)
         self.world.attach_rigid_body(d_coll.node())
@@ -534,43 +563,42 @@ class app(ShowBase):
                         self.player_gun.show()
 
                 if self.keyMap["left"]:
-                    self.player.setX(self.player, -self.striveSpeed * globalClock.get_dt())
+                    self.player.set_x(self.player, -self.striveSpeed * globalClock.get_dt())
 
                 if self.keyMap["right"]:
-                    self.player.setX(self.player, self.striveSpeed * globalClock.get_dt())
+                    self.player.set_x(self.player, self.striveSpeed * globalClock.get_dt())
 
                 if self.keyMap["forward"]:
-                    self.player.setY(self.player, self.movementSpeedForward * globalClock.get_dt())
+                    self.player.set_y(self.player, self.movementSpeedForward * globalClock.get_dt())
                     
-                    myAnimControl = actor_data.player_character.getAnimControl('walking')
+                    myAnimControl = actor_data.player_character.get_anim_control('walking')
                     if not myAnimControl.isPlaying():
                         actor_data.player_character.play("walking")
                         actor_data.player_character.set_play_rate(4.0, 'walking')
                     
                 if self.keyMap["forward"] != 1:
-                    walkControl = actor_data.player_character.getAnimControl('walking')
+                    walkControl = actor_data.player_character.get_anim_control('walking')
                     walkControl.stop()
                     
                 if self.keyMap["backward"]:
                     self.player.setY(self.player, -self.movementSpeedBackward * globalClock.get_dt())
-                    '''
-                    myBackControl = actor_data.player_character.getAnimControl('backWalk')
+                    
+                    myBackControl = actor_data.player_character.get_anim_control('walking')
                     if not myBackControl.isPlaying():
                         myBackControl.stop()
-                        actor_data.player_character.play('backWalk')
-                        actor_data.player_character.set_play_rate(-1.0, 'backWalk')
-                    '''
+                        actor_data.player_character.play('walking')
+                        actor_data.player_character.set_play_rate(-4.0, 'walking')
+                    
                 if self.keyMap["backward"] != 1:
                     pass
-                    '''
-                    walkControl = actor_data.player_character.getAnimControl('backWalk')
+                    
+                    walkControl = actor_data.player_character.get_anim_control('walking')
                     walkControl.stop()
-                    '''
+                    
             return Task.cont
 
         # infinite ground plane
-        from panda3d.bullet import BulletPlaneShape
-        from panda3d.bullet import BulletRigidBodyNode
+        # the effective world-Z limit
         ground_plane = BulletPlaneShape(Vec3(0, 0, 1), 0)
         node = BulletRigidBodyNode('ground')
         node.add_shape(ground_plane)

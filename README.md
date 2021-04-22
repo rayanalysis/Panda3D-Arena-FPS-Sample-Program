@@ -1,4 +1,3 @@
-![boxes_sample](https://user-images.githubusercontent.com/3117958/115658528-2b79f700-a2f6-11eb-8346-f2b3b7251b31.png)
 # Panda3D-Arena-FPS-Sample-Program
 This is a modern Panda3D sample program with an Arena first person shooter environment and many basic features. This program would be useful to experienced Python programmers jumping into Panda3D with the intention of building a first person shooter.
 

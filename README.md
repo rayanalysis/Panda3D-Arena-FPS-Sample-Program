@@ -21,7 +21,8 @@ Included Full Assets:
 - Handgun model with Blender file
 - Adult male model with Blender file and .bam animation exports
 - Arena model with Blender file
-- 
+- Cube model for randomly colored physics cubes
+
 Game Goal:
 - Neutralize the NPC by shooting the head hitbox
 - Receive success message

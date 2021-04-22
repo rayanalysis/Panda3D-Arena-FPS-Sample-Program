@@ -9,7 +9,7 @@ Features:
 - Working blend2bam Actor exporting script
 - Physically based shaders via panda3d-simplepbr
 - Hardware Skinning support via customized Actor shaders
-- Bullet Physics integration of environment and characters
+- Bullet Physics integration of environment, characters, and collision cubes
 - Advanced timing logic in Panda3D
 - Basic weapon loading and procedural animation
 - State machine based onscreen text updating

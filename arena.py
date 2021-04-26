@@ -88,7 +88,7 @@ class app(ShowBase):
         # self.camera.set_pos(0, 0, 2)
         
         # ConfigVariableManager.getGlobalPtr().listVariables()
-
+        
         # point light generator
         for x in range(0, 4):
             plight_1 = PointLight('plight')
@@ -97,10 +97,10 @@ class app(ShowBase):
             # group the lights close to each other to create a sun effect
             plight_1_node.set_pos(random.uniform(-20, -21), random.uniform(-20, -21), random.uniform(20, 21))
             self.render.set_light(plight_1_node)
-
+        
         self.accept("f3", self.toggleWireframe)
         self.accept("escape", sys.exit, [0])
-
+        
         self.game_start = 0
         
         from panda3d.bullet import BulletWorld
@@ -222,7 +222,7 @@ class app(ShowBase):
         text_2_node.set_scale(0.04)
         text_2_node.set_pos(-1.4, 0, 0.8)
         # import font and set pixels per unit font quality
-        nunito_font = loader.load_font('fonts/Nunito/Nunito-Light.ttf')
+        nunito_font = self.loader.load_font('fonts/Nunito/Nunito-Light.ttf')
         nunito_font.set_pixels_per_unit(100)
         nunito_font.set_page_size(512, 512)
         # apply font
@@ -283,7 +283,7 @@ class app(ShowBase):
             d_coll.node().set_ccd_swept_sphere_radius(0.30)
             d_coll.node().set_deactivation_enabled(False)
             d_coll.set_pos(random.uniform(-60, -20), random.uniform(-60, -20), random.uniform(5, 10))
-            box_model = self.loader.loadModel('models/1m_cube.gltf')
+            box_model = self.loader.load_model('models/1m_cube.gltf')
             box_model.reparent_to(self.render)
             box_model.reparent_to(d_coll)
             box_model.set_color(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
@@ -581,7 +581,7 @@ class app(ShowBase):
                     walkControl.stop()
                     
                 if self.keyMap["backward"]:
-                    self.player.setY(self.player, -self.movementSpeedBackward * globalClock.get_dt())
+                    self.player.set_y(self.player, -self.movementSpeedBackward * globalClock.get_dt())
                     
                     myBackControl = actor_data.player_character.get_anim_control('walking')
                     if not myBackControl.isPlaying():

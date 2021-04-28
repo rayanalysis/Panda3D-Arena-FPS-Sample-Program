@@ -68,6 +68,7 @@ class app(ShowBase):
             textures-power-2 none
             hardware-animated-vertices #t
             gl-depth-zero-to-one true
+            clock-frame-rate 60
             interpolate-frames 1
             fullscreen #f
         """)
@@ -247,7 +248,7 @@ class app(ShowBase):
                     # self.slight.setShadowCaster(True, 512, 512)
                     self.slight.set_color(VBase4(0.5, 0.6, 0.6, 1))  # slightly bluish
                     lens = PerspectiveLens()
-                    lens.set_near_far(0.005, 5000)
+                    lens.set_near_far(0.05, 5000)
                     self.slight.set_lens(lens)
                     self.slight.set_attenuation((0.5, 0, 0.0000005))
                     self.slight = self.render.attach_new_node(self.slight)
@@ -573,6 +574,7 @@ class app(ShowBase):
                     
                     myAnimControl = actor_data.player_character.get_anim_control('walking')
                     if not myAnimControl.isPlaying():
+                        myAnimControl.stop()
                         actor_data.player_character.play("walking")
                         actor_data.player_character.set_play_rate(4.0, 'walking')
                     
@@ -591,9 +593,6 @@ class app(ShowBase):
                     
                 if self.keyMap["backward"] != 1:
                     pass
-                    
-                    walkControl = actor_data.player_character.get_anim_control('walking')
-                    walkControl.stop()
                     
             return Task.cont
 

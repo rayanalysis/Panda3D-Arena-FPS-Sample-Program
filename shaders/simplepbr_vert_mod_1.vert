@@ -39,8 +39,9 @@ out vec3 v_position;
 out vec4 v_color;
 out mat3 v_tbn;
 out vec2 v_texcoord;
+
 #ifdef ENABLE_SHADOWS
-out vec4 v_shadow_pos[MAX_LIGHTS];
+    out vec4 v_shadow_pos[MAX_LIGHTS];
 #endif
 
 void main() {

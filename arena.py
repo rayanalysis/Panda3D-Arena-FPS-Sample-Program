@@ -565,22 +565,36 @@ class app(ShowBase):
 
                 if self.keyMap["left"]:
                     self.player.set_x(self.player, -self.striveSpeed * globalClock.get_dt())
+                    
+                    myAnimControl = actor_data.player_character.get_anim_control('walking')
+                    if not myAnimControl.isPlaying():
+                        actor_data.player_character.play("walking")
+                        actor_data.player_character.set_play_rate(4.0, 'walking')
+                        
+                if not self.keyMap["left"]:
+                    pass
 
                 if self.keyMap["right"]:
                     self.player.set_x(self.player, self.striveSpeed * globalClock.get_dt())
+                    
+                    myAnimControl = actor_data.player_character.get_anim_control('walking')
+                    if not myAnimControl.isPlaying():
+                        actor_data.player_character.play("walking")
+                        actor_data.player_character.set_play_rate(4.0, 'walking')
+                        
+                if not self.keyMap["right"]:
+                    pass
 
                 if self.keyMap["forward"]:
                     self.player.set_y(self.player, self.movementSpeedForward * globalClock.get_dt())
                     
                     myAnimControl = actor_data.player_character.get_anim_control('walking')
                     if not myAnimControl.isPlaying():
-                        myAnimControl.stop()
                         actor_data.player_character.play("walking")
                         actor_data.player_character.set_play_rate(4.0, 'walking')
                     
                 if self.keyMap["forward"] != 1:
-                    walkControl = actor_data.player_character.get_anim_control('walking')
-                    walkControl.stop()
+                    pass
                     
                 if self.keyMap["backward"]:
                     self.player.set_y(self.player, -self.movementSpeedBackward * globalClock.get_dt())

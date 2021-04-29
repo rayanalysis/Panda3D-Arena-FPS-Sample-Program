@@ -70,6 +70,7 @@ class app(ShowBase):
             gl-depth-zero-to-one true
             clock-frame-rate 60
             interpolate-frames 1
+            cursor-hidden #t
             fullscreen #f
         """)
 

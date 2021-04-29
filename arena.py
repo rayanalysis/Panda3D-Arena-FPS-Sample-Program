@@ -33,10 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from direct.showbase.ShowBase import ShowBase
 from direct.stdpy import threading2
 from panda3d.core import load_prc_file_data
-from panda3d.core import PointLight
 from panda3d.core import BitMask32
 from panda3d.core import Shader, ShaderAttrib
 from panda3d.core import TransformState
+from panda3d.core import PointLight
 from panda3d.core import Spotlight
 from panda3d.core import PerspectiveLens
 from panda3d.core import ConfigVariableManager
@@ -108,7 +108,6 @@ class app(ShowBase):
         from panda3d.bullet import BulletCharacterControllerNode
         from panda3d.bullet import ZUp
         from panda3d.bullet import BulletCapsuleShape
-        from panda3d.bullet import BulletConvexHullShape
         from panda3d.bullet import BulletTriangleMesh
         from panda3d.bullet import BulletTriangleMeshShape
         from panda3d.bullet import BulletBoxShape
@@ -218,7 +217,7 @@ class app(ShowBase):
         
         # directly make a text node to display text
         text_2 = TextNode('text_2_node')
-        text_2.set_text("Neutralize the NPC by shooting the head." + '\n' + "Press 'f' to activate the flashlight.")
+        text_2.set_text("Neutralize the NPC by shooting the head." + '\n' + "Press 'f' to toggle the flashlight.")
         text_2_node = self.aspect2d.attach_new_node(text_2)
         text_2_node.set_scale(0.04)
         text_2_node.set_pos(-1.4, 0, 0.8)
@@ -418,11 +417,14 @@ class app(ShowBase):
                     npc_1_control = actor_data.NPC_1.get_anim_control('death')
                     if not npc_1_control.is_playing():
                         actor_data.NPC_1.play('death')
+                    
+                    def remove_nodes():    
+                        # Bullet node removals
+                        self.world.remove(target)
+                        rigid_target = self.render.find('**/d_coll_A')
+                        self.world.remove(rigid_target.node())
                         
-                    # Bullet node removals
-                    self.world.remove(target)
-                    rigid_target = self.render.find('**/d_coll_A')
-                    self.world.remove(rigid_target.node())
+                    threading2._start_new_thread(remove_nodes, ())
                             
         self.accept('mouse1', is_npc_1_shot)                    
         

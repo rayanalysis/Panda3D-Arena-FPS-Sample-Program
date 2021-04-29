@@ -470,11 +470,11 @@ class app(ShowBase):
                     actor_data.NPC_1.look_at(self.player)
                     npc_1_head.look_at(self.player)
                     
-                    if actor_data.NPC_1.get_p() > 9:
-                        actor_data.NPC_1.set_p(9)
+                    if actor_data.NPC_1.get_p() > 3:
+                        actor_data.NPC_1.set_p(3)
                         
-                    if npc_1_head.get_p() > 9:
-                        npc_1_head.set_p(9)
+                    if npc_1_head.get_p() > 3:
+                        npc_1_head.set_p(3)
 
                     m_inst = self.npc_1_move_increment
                     t_inst = globalClock.get_dt()

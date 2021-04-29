@@ -408,23 +408,23 @@ class app(ShowBase):
                 target_dot = self.aspect2d.find_all_matches("**/target_dot_node")
 
                 if 'special_node_A' in str(target):
-                    # the head is hit, the npc is dead
-                    self.npc_1_is_dead = True
-                    text_2.set_text('Congrats, you have won!')
-                    npc_1_control = actor_data.NPC_1.get_anim_control('walking')
-                    if npc_1_control.is_playing():
-                        actor_data.NPC_1.stop()
-                    npc_1_control = actor_data.NPC_1.get_anim_control('death')
-                    if not npc_1_control.is_playing():
-                        actor_data.NPC_1.play('death')
-                    
-                    def remove_nodes():    
+                    def npc_cleanup():
+                        # the head is hit, the npc is dead
+                        self.npc_1_is_dead = True
+                        text_2.set_text('Congrats, you have won!')
+                        npc_1_control = actor_data.NPC_1.get_anim_control('walking')
+                        if npc_1_control.is_playing():
+                            actor_data.NPC_1.stop()
+                        npc_1_control = actor_data.NPC_1.get_anim_control('death')
+                        if not npc_1_control.is_playing():
+                            actor_data.NPC_1.play('death')
+                        
                         # Bullet node removals
                         self.world.remove(target)
                         rigid_target = self.render.find('**/d_coll_A')
                         self.world.remove(rigid_target.node())
                         
-                    threading2._start_new_thread(remove_nodes, ())
+                    threading2._start_new_thread(npc_cleanup, ())
                             
         self.accept('mouse1', is_npc_1_shot)                    
         
@@ -469,12 +469,21 @@ class app(ShowBase):
                     # make the npc look at the player continuously
                     actor_data.NPC_1.look_at(self.player)
                     npc_1_head.look_at(self.player)
+                    
+                    if actor_data.NPC_1.get_p() > 9:
+                        actor_data.NPC_1.set_p(9)
+                        
+                    if npc_1_head.get_p() > 9:
+                        npc_1_head.set_p(9)
+
                     m_inst = self.npc_1_move_increment
                     t_inst = globalClock.get_dt()
                     actor_data.NPC_1.get_parent().set_pos(npc_pos_1[0] + (m_inst[0] * t_inst), npc_pos_1[1] + (m_inst[1] * t_inst), npc_pos_1[2])
                     
                 if self.npc_1_is_dead:
                     npc_1_head.hide()
+                    inst_h = actor_data.NPC_1.get_h()
+                    actor_data.NPC_1.set_hpr(inst_h, 0, 0)
                 
                 # target dot ray test
                 # turns the target dot red

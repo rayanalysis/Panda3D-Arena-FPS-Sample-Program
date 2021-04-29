@@ -483,7 +483,8 @@ class app(ShowBase):
                 if self.npc_1_is_dead:
                     npc_1_head.hide()
                     inst_h = actor_data.NPC_1.get_h()
-                    actor_data.NPC_1.set_hpr(inst_h, 0, 0)
+                    inst_p = actor_data.NPC_1.get_p()
+                    actor_data.NPC_1.set_hpr(inst_h, inst_p, 0)
                 
                 # target dot ray test
                 # turns the target dot red

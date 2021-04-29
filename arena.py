@@ -99,7 +99,7 @@ class app(ShowBase):
             plight_1_node.set_pos(random.uniform(-21, -20), random.uniform(-21, -20), random.uniform(20, 21))
             self.render.set_light(plight_1_node)
         
-        self.accept("f3", self.toggleWireframe)
+        self.accept("f3", self.toggle_wireframe)
         self.accept("escape", sys.exit, [0])
         
         self.game_start = 0
@@ -643,13 +643,13 @@ class app(ShowBase):
         self.world.set_debug_node(debugNP.node())
 
         # debug toggle function
-        def toggleDebug():
+        def toggle_debug():
             if debugNP.is_hidden():
                 debugNP.show()
             else:
                 debugNP.hide()
 
-        self.accept('f1', toggleDebug)
+        self.accept('f1', toggle_debug)
 
         def update(Task):
             if self.game_start < 1:

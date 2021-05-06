@@ -355,7 +355,7 @@ class app(ShowBase):
             while not self.npc_1_is_dead:
                 m_incs = []
                 for x in range(0, 2):
-                    m_incs.append(random.uniform(1, 5))
+                    m_incs.append(random.uniform(2, 5))
                 
                 print('NPC_1 movement increments this cycle: ' + str(m_incs))
                 self.npc_1_move_increment[0] = m_incs[0]
@@ -426,6 +426,25 @@ class app(ShowBase):
                         self.world.remove(rigid_target.node())
                         
                     threading2._start_new_thread(npc_cleanup, ())
+                    
+                    if not self.gun_anim_is_playing:
+                        self.gun_anim_is_playing = True
+                
+                        def end_gun_anim(t):
+                            t = t * 3
+                            self.gun_anim_is_playing = False
+                    
+                        lf_end = LerpFunc(end_gun_anim, fromData=2.5, toData=4, duration=0)
+                
+                        gun_pos = self.player_gun.get_pos()
+                        gun_hpr = self.player_gun.get_hpr()
+                        gun_anim_1 = LerpPosHprInterval(self.player_gun, 0.05, (gun_pos[0] + 0.01, gun_pos[1] + 0.01, gun_pos[2] + 0.01), (gun_hpr[0], gun_hpr[1] + 10, gun_hpr[2]))
+                        gun_anim_2 = LerpPosHprInterval(self.player_gun, 0.1, (gun_pos), (gun_hpr))
+                        ga_list = Sequence()
+                        ga_list.append(gun_anim_1)
+                        ga_list.append(gun_anim_2)
+                        ga_list.append(lf_end)
+                        ga_list.start()
                             
         self.accept('mouse1', is_npc_1_shot)                    
         

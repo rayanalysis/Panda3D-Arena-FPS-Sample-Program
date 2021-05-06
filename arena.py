@@ -379,7 +379,7 @@ class app(ShowBase):
                 self.gun_anim_is_playing = True
                 
                 def end_gun_anim(t):
-                    t = t * 3
+                    t = t * 13
                     self.gun_anim_is_playing = False
                     
                 lf_end = LerpFunc(end_gun_anim, fromData=2.5, toData=4, duration=0)

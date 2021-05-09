@@ -182,7 +182,7 @@ class app(ShowBase):
         self.camera.set_z(self.player, 0.5)
         
         # player gun begins
-        self.player_gun = self.loader.load_model('models/handgun_1.gltf')
+        self.player_gun = actor_data.arm_handgun
         self.player_gun.reparent_to(self.render)
         self.player_gun.reparent_to(self.camera)
         self.player_gun.set_x(self.camera, 0.1)
@@ -375,24 +375,11 @@ class app(ShowBase):
         
         def is_npc_1_shot():
             # animate the gun
-            if not self.gun_anim_is_playing:
-                self.gun_anim_is_playing = True
-                
-                def end_gun_anim(t):
-                    t = t * 13
-                    self.gun_anim_is_playing = False
-                    
-                lf_end = LerpFunc(end_gun_anim, fromData=2.5, toData=4, duration=0)
-                
-                gun_pos = self.player_gun.get_pos()
-                gun_hpr = self.player_gun.get_hpr()
-                gun_anim_1 = LerpPosHprInterval(self.player_gun, 0.05, (gun_pos[0] + 0.01, gun_pos[1] + 0.01, gun_pos[2] + 0.01), (gun_hpr[0], gun_hpr[1] + 10, gun_hpr[2]))
-                gun_anim_2 = LerpPosHprInterval(self.player_gun, 0.1, (gun_pos), (gun_hpr))
-                ga_list = Sequence()
-                ga_list.append(gun_anim_1)
-                ga_list.append(gun_anim_2)
-                ga_list.append(lf_end)
-                ga_list.start()
+            gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
+            if not gun_ctrl.is_playing():
+                actor_data.arm_handgun.stop()
+                actor_data.arm_handgun.play("shoot")
+                actor_data.arm_handgun.set_play_rate(10.0, 'shoot')
             
             # target dot ray test
             # get mouse data
@@ -426,25 +413,6 @@ class app(ShowBase):
                         self.world.remove(rigid_target.node())
                         
                     threading2._start_new_thread(npc_cleanup, ())
-                    
-                    if not self.gun_anim_is_playing:
-                        self.gun_anim_is_playing = True
-                
-                        def end_gun_anim(t):
-                            t = t * 3
-                            self.gun_anim_is_playing = False
-                    
-                        lf_end = LerpFunc(end_gun_anim, fromData=2.5, toData=4, duration=0)
-                
-                        gun_pos = self.player_gun.get_pos()
-                        gun_hpr = self.player_gun.get_hpr()
-                        gun_anim_1 = LerpPosHprInterval(self.player_gun, 0.05, (gun_pos[0] + 0.01, gun_pos[1] + 0.01, gun_pos[2] + 0.01), (gun_hpr[0], gun_hpr[1] + 10, gun_hpr[2]))
-                        gun_anim_2 = LerpPosHprInterval(self.player_gun, 0.1, (gun_pos), (gun_hpr))
-                        ga_list = Sequence()
-                        ga_list.append(gun_anim_1)
-                        ga_list.append(gun_anim_2)
-                        ga_list.append(lf_end)
-                        ga_list.start()
                             
         self.accept('mouse1', is_npc_1_shot)                    
         

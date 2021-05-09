@@ -379,7 +379,7 @@ class app(ShowBase):
             if not gun_ctrl.is_playing():
                 actor_data.arm_handgun.stop()
                 actor_data.arm_handgun.play("shoot")
-                actor_data.arm_handgun.set_play_rate(10.0, 'shoot')
+                actor_data.arm_handgun.set_play_rate(15.0, 'shoot')
             
             # target dot ray test
             # get mouse data

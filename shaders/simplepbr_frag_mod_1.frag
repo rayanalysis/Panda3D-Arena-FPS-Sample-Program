@@ -2,16 +2,11 @@
 // Based on panda3d-simplepbr (see license files for information)
 // Based on code from https://github.com/KhronosGroup/glTF-Sample-Viewer
 
-#version 120
+#version 130
 
 #ifndef MAX_LIGHTS
     #define MAX_LIGHTS 8
 #endif
-
-//    defines['p3d_TextureBaseColor'] = 'p3d_Texture0'
-//    defines['p3d_TextureMetalRoughness'] = 'p3d_Texture1'
-//    defines['p3d_TextureNormal'] = 'p3d_Texture2'
-//    defines['p3d_TextureEmission'] = 'p3d_Texture3'
 
 uniform struct p3d_MaterialParameters {
     vec4 baseColor;
@@ -28,10 +23,8 @@ uniform struct p3d_LightSourceParameters {
     vec3 spotDirection;
     float spotCosCutoff;
     
-#ifdef ENABLE_SHADOWS
-    sampler2DShadow shadowMap;
-    mat4 shadowViewMatrix;
-#endif
+sampler2DShadow shadowMap;
+mat4 shadowViewMatrix;
 
 } p3d_LightSource[MAX_LIGHTS];
 
@@ -39,12 +32,10 @@ uniform struct p3d_LightModelParameters {
     vec4 ambient;
 } p3d_LightModel;
 
-#ifdef ENABLE_FOG
 uniform struct p3d_FogParameters {
     vec4 color;
     float density;
 } p3d_Fog;
-#endif
 
 uniform vec4 p3d_ColorScale;
 
@@ -76,9 +67,8 @@ varying vec4 v_color;
 varying vec2 v_texcoord;
 varying mat3 v_tbn;
 
-#ifdef ENABLE_SHADOWS
-    varying vec4 v_shadow_pos[MAX_LIGHTS];
-#endif
+
+varying vec4 v_shadow_pos[MAX_LIGHTS];
 
 // Schlick's Fresnel approximation with Spherical Gaussian approximation to replace the power
 vec3 specular_reflection(FunctionParamters func_params) {
@@ -131,17 +121,9 @@ void main() {
 #endif
     vec3 v = normalize(-v_position);
 
-#ifdef USE_OCCLUSION_MAP
-    float ambient_occlusion = metal_rough.r;
-#else
-    float ambient_occlusion = 1.0;
-#endif
+float ambient_occlusion = metal_rough.r;
 
-#ifdef USE_EMISSION_MAP
-    vec3 emission = p3d_Material.emission.rgb * texture2D(p3d_Texture3, v_texcoord).rgb;
-#else
-    vec3 emission = vec3(0.0);
-#endif
+vec3 emission = p3d_Material.emission.rgb * texture2D(p3d_Texture3, v_texcoord).rgb;
 
     vec4 color = vec4(vec3(0.0), base_color.a);
 
@@ -161,11 +143,8 @@ void main() {
         float spotcos = dot(normalize(p3d_LightSource[i].spotDirection), -l);
         float spotcutoff = p3d_LightSource[i].spotCosCutoff;
         float shadowSpot = smoothstep(spotcutoff-SPOTSMOOTH, spotcutoff+SPOTSMOOTH, spotcos);
-#ifdef ENABLE_SHADOWS
+
         float shadowCaster = shadow2DProj(p3d_LightSource[i].shadowMap, v_shadow_pos[i]).r;
-#else
-        float shadowCaster = 1.0;
-#endif
         float shadow = shadowSpot * shadowCaster * attenuation_factor;
 
         FunctionParamters func_params;

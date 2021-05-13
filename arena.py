@@ -252,7 +252,7 @@ class app(ShowBase):
                     self.slight.setShadowCaster(True, 512, 512)
                     self.slight.set_color(VBase4(0.5, 0.6, 0.6, 1))  # slightly bluish
                     lens = PerspectiveLens()
-                    lens.set_near_far(0.05, 5000)
+                    lens.set_near_far(0.5, 5000)
                     self.slight.set_lens(lens)
                     self.slight.set_attenuation((0.5, 0, 0.0000005))
                     self.slight = self.render.attach_new_node(self.slight)

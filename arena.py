@@ -230,11 +230,11 @@ class app(ShowBase):
         text_2.set_font(nunito_font)
         text_2.set_text_color(0, 0.3, 1, 1)
         
-        # print player position on mouse click
+        # print player position on right mouse click
         def print_player_pos():
             print(self.player.get_pos())
 
-        self.accept('mouse1', print_player_pos)
+        self.accept('mouse3', print_player_pos)
 
         self.flashlight_state = 0
 

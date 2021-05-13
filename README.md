@@ -27,6 +27,8 @@ Game Goal:
 - Neutralize the NPC by shooting the head hitbox
 - Receive success message
 
+![Screenshot from 2021-05-13 06-35-22](https://user-images.githubusercontent.com/3117958/118127627-3127a180-b3b7-11eb-9e24-3ba0bd18852f.png)
+![Screenshot from 2021-05-13 06-39-11](https://user-images.githubusercontent.com/3117958/118127681-3f75bd80-b3b7-11eb-9de0-c902521ae374.png)
 ![boxes_sample](https://user-images.githubusercontent.com/3117958/115658620-582e0e80-a2f6-11eb-974f-e026cd7a5c63.png)
 ![flashlight_sample](https://user-images.githubusercontent.com/3117958/115658634-5ebc8600-a2f6-11eb-9908-6d2592d8571a.png)
 ![target_sample](https://user-images.githubusercontent.com/3117958/115130068-87b4e200-9fa9-11eb-9db8-6c0ccb8f44c4.png)

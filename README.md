@@ -11,7 +11,7 @@ Features:
 - Hardware Skinning support via customized Actor shaders
 - Bullet Physics integration of environment, characters, and collision cubes
 - Advanced timing logic in Panda3D
-- Basic weapon loading and procedural animation
+- Basic weapon loading and animation
 - State machine based onscreen text updating
 - Toggle based flashlight with shadow casting
 - Modern .gltf and .bam based modeling

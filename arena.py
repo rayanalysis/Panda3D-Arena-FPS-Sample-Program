@@ -40,6 +40,8 @@ from panda3d.core import PointLight
 from panda3d.core import Spotlight
 from panda3d.core import PerspectiveLens
 from panda3d.core import ConfigVariableManager
+from panda3d.core import FrameBufferProperties
+from panda3d.core import AntialiasAttrib
 import sys
 import random
 import time
@@ -64,6 +66,8 @@ class app(ShowBase):
             window-title Panda3D Arena Sample FPS Bullet Auto Colliders PBR HW Skinning
             show-frame-rate-meter #t
             framebuffer-srgb #t
+            framebuffer-multisample 1
+            multisamples 4
             view-frustum-cull 0
             textures-power-2 none
             hardware-animated-vertices #t
@@ -76,8 +80,6 @@ class app(ShowBase):
 
         # Initialize the showbase
         super().__init__()
-        pipeline = simplepbr.init()
-        pipeline.enable_shadows = True
         gltf.patch_loader(self.loader)
         
         props = WindowProperties()
@@ -151,10 +153,12 @@ class app(ShowBase):
         
         make_collision_from_model(arena_1, 0, 0, self.world, (arena_1.get_pos()))
 
-        # prototype hardware shader for Actor nodes
-        actor_shader = Shader.load(Shader.SL_GLSL, "shaders/simplepbr_vert_mod_1.vert", "shaders/simplepbr_frag_mod_1.frag")
-        actor_shader = ShaderAttrib.make(actor_shader)
-        actor_shader = actor_shader.setFlag(ShaderAttrib.F_hardware_skinning, True)
+        # load the scene shader
+        scene_shader = Shader.load(Shader.SL_GLSL, "shaders/simplepbr_vert_mod_1.vert", "shaders/simplepbr_frag_mod_1.frag")
+        self.render.set_shader(scene_shader)
+        self.render.set_antialias(AntialiasAttrib.MMultisample)
+        scene_shader = ShaderAttrib.make(scene_shader)
+        scene_shader = scene_shader.setFlag(ShaderAttrib.F_hardware_skinning, True)
 
         # initialize player character physics the Bullet way
         shape_1 = BulletCapsuleShape(0.75, 0.5, ZUp)
@@ -171,7 +175,7 @@ class app(ShowBase):
         fp_character.reparent_to(self.render)
         fp_character.set_scale(1)
         # set the actor skinning hardware shader
-        fp_character.set_attrib(actor_shader)
+        fp_character.set_attrib(scene_shader)
 
         self.camera.reparent_to(self.player)
         # reparent character to FPS cam
@@ -230,7 +234,7 @@ class app(ShowBase):
         text_2.set_font(nunito_font)
         text_2.set_text_color(0, 0.3, 1, 1)
         
-        # print player position on right mouse click
+        # print player position on mouse click
         def print_player_pos():
             print(self.player.get_pos())
 
@@ -245,7 +249,7 @@ class app(ShowBase):
                 if len(current_flashlight) == 0:
                     self.slight = 0
                     self.slight = Spotlight('flashlight')
-                    # self.slight.setShadowCaster(True, 512, 512)
+                    self.slight.setShadowCaster(True, 512, 512)
                     self.slight.set_color(VBase4(0.5, 0.6, 0.6, 1))  # slightly bluish
                     lens = PerspectiveLens()
                     lens.set_near_far(0.05, 5000)
@@ -301,7 +305,7 @@ class app(ShowBase):
         npc_model_1 = actor_data.NPC_1
         npc_model_1.reparent_to(np)
         # set the actor skinning hardware shader
-        npc_model_1.set_attrib(actor_shader)
+        npc_model_1.set_attrib(scene_shader)
         # get the separate head model
         npc_1_head = self.loader.load_model('models/npc_1_head.gltf')
         npc_1_head.reparent_to(actor_data.NPC_1.get_parent())

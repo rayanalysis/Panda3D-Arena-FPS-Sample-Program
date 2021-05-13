@@ -62,13 +62,13 @@ const float PI = 3.141592653589793;
 const float SPOTSMOOTH = 0.001;
 const float LIGHT_CUTOFF = 0.001;
 
-varying vec3 v_position;
-varying vec4 v_color;
-varying vec2 v_texcoord;
-varying mat3 v_tbn;
+in vec3 v_position;
+in vec4 v_color;
+in vec2 v_texcoord;
+in mat3 v_tbn;
 
 
-varying vec4 v_shadow_pos[MAX_LIGHTS];
+in vec4 v_shadow_pos[MAX_LIGHTS];
 
 // Schlick's Fresnel approximation with Spherical Gaussian approximation to replace the power
 vec3 specular_reflection(FunctionParamters func_params) {

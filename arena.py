@@ -85,6 +85,7 @@ class app(ShowBase):
         props = WindowProperties()
         props.set_mouse_mode(WindowProperties.M_relative)
         base.win.request_properties(props)
+        base.set_background_color(0.5, 0.5, 0.8)
         
         self.camLens.set_fov(80)
         self.camLens.set_near_far(0.01, 90000)
@@ -272,7 +273,7 @@ class app(ShowBase):
         self.accept('f', toggle_flashlight)
         
         # add a few random physics boxes
-        for x in range(0, 20):
+        for x in range(0, 40):
             # dynamic collision
             random_vec = Vec3(1, 1, 1)
             special_shape = BulletBoxShape(random_vec)

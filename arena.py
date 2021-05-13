@@ -53,7 +53,6 @@ from direct.interval.IntervalGlobal import *
 from direct.gui.DirectGui import *
 from panda3d.core import TextNode
 # new pbr imports
-import simplepbr
 import gltf
 # local imports
 import actor_data

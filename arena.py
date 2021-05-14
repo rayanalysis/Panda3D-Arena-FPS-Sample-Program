@@ -75,7 +75,7 @@ class app(ShowBase):
             clock-frame-rate 60
             interpolate-frames 1
             cursor-hidden #t
-            fullscreen #t
+            fullscreen #f
         """)
 
         # Initialize the showbase

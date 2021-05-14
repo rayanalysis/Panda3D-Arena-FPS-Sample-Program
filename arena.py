@@ -42,6 +42,7 @@ from panda3d.core import PerspectiveLens
 from panda3d.core import ConfigVariableManager
 from panda3d.core import FrameBufferProperties
 from panda3d.core import AntialiasAttrib
+from panda3d.core import Fog
 import sys
 import random
 import time
@@ -74,7 +75,7 @@ class app(ShowBase):
             clock-frame-rate 60
             interpolate-frames 1
             cursor-hidden #t
-            fullscreen #f
+            fullscreen #t
         """)
 
         # Initialize the showbase
@@ -104,6 +105,11 @@ class app(ShowBase):
         
         self.accept("f3", self.toggle_wireframe)
         self.accept("escape", sys.exit, [0])
+        
+        exponential_fog = Fog('world_fog')
+        exponential_fog.set_color(0.6, 0.7, 0.7)
+        exponential_fog.set_exp_density(0.00009)
+        self.render.set_fog(exponential_fog)
         
         self.game_start = 0
         
@@ -249,14 +255,14 @@ class app(ShowBase):
                 if len(current_flashlight) == 0:
                     self.slight = 0
                     self.slight = Spotlight('flashlight')
-                    self.slight.setShadowCaster(True, 512, 512)
+                    self.slight.setShadowCaster(True, 1024, 1024)
                     self.slight.set_color(VBase4(0.5, 0.6, 0.6, 1))  # slightly bluish
                     lens = PerspectiveLens()
                     lens.set_near_far(0.5, 5000)
                     self.slight.set_lens(lens)
                     self.slight.set_attenuation((0.5, 0, 0.0000005))
                     self.slight = self.render.attach_new_node(self.slight)
-                    self.slight.set_pos(-0.1, 0.2, -0.4)
+                    self.slight.set_pos(-0.1, 0.3, -0.4)
                     self.slight.reparent_to(self.camera)
                     self.flashlight_state = 1
                     self.render.set_light(self.slight)

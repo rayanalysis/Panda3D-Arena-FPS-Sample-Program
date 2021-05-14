@@ -67,7 +67,6 @@ in vec4 v_color;
 in vec2 v_texcoord;
 in mat3 v_tbn;
 
-
 in vec4 v_shadow_pos[MAX_LIGHTS];
 
 // Schlick's Fresnel approximation with Spherical Gaussian approximation to replace the power
@@ -121,10 +120,8 @@ void main() {
 #endif
     vec3 v = normalize(-v_position);
 
-float ambient_occlusion = metal_rough.r;
-
-vec3 emission = p3d_Material.emission.rgb * texture2D(p3d_Texture3, v_texcoord).rgb;
-
+    float ambient_occlusion = metal_rough.r;
+    vec3 emission = p3d_Material.emission.rgb * texture2D(p3d_Texture3, v_texcoord).rgb;
     vec4 color = vec4(vec3(0.0), base_color.a);
 
     for (int i = 0; i < p3d_LightSource.length(); ++i) {
@@ -171,12 +168,10 @@ vec3 emission = p3d_Material.emission.rgb * texture2D(p3d_Texture3, v_texcoord).
     color.rgb += diffuse_color * p3d_LightModel.ambient.rgb * ambient_occlusion;
     color.rgb += emission;
 
-#ifdef ENABLE_FOG
     // Exponential fog
     float fog_distance = length(v_position);
     float fog_factor = clamp(1.0 / exp(fog_distance * p3d_Fog.density), 0.0, 1.0);
     color = mix(p3d_Fog.color, color, fog_factor);
-#endif
 
     gl_FragColor = color;
 }

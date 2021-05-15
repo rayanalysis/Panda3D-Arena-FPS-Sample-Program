@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from direct.showbase.ShowBase import ShowBase
 from direct.stdpy import threading2
+from direct.filter.CommonFilters import CommonFilters
 from panda3d.core import load_prc_file_data
 from panda3d.core import BitMask32
 from panda3d.core import Shader, ShaderAttrib
@@ -95,13 +96,31 @@ class app(ShowBase):
         # ConfigVariableManager.getGlobalPtr().listVariables()
         
         # point light generator
-        for x in range(0, 4):
+        for x in range(0, 3):
             plight_1 = PointLight('plight')
             # add plight props here
             plight_1_node = self.render.attach_new_node(plight_1)
             # group the lights close to each other to create a sun effect
             plight_1_node.set_pos(random.uniform(-21, -20), random.uniform(-21, -20), random.uniform(20, 21))
             self.render.set_light(plight_1_node)
+        
+        # point light for volumetric lighting filter
+        plight_1 = PointLight('plight')
+        # add plight props here
+        plight_1_node = self.render.attach_new_node(plight_1)
+        # group the lights close to each other to create a sun effect
+        plight_1_node.set_pos(random.uniform(-21, -20), random.uniform(-21, -20), random.uniform(20, 21))
+        self.render.set_light(plight_1_node)
+            
+        scene_filters = CommonFilters(base.win, base.cam)
+        scene_filters.set_bloom()
+        scene_filters.set_high_dynamic_range()
+        scene_filters.set_exposure_adjust(0.6)
+        scene_filters.set_gamma_adjust(1.1)
+        # scene_filters.set_volumetric_lighting(plight_1_node, 32, 0.5, 0.7, 0.1)
+        # scene_filters.set_blur_sharpen(0.9)
+        # scene_filters.set_ambient_occlusion(32, 0.05, 2.0, 0.01, 0.000002)
+        # scene_filters.set_cartoon_ink()
         
         self.accept("f3", self.toggle_wireframe)
         self.accept("escape", sys.exit, [0])

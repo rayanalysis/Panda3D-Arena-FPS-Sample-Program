@@ -6,6 +6,7 @@ Features:
 - First person camera handling system
 - Interactive target dot reticule system
 - Armature with "walking" and "death" animations
+- Bloom, HDR, Exposure, Gamma, Volumetric Lighting, Blur/Sharpen, and Ambient Occlusion support
 - Working blend2bam Actor exporting script
 - Physically based shaders via panda3d-simplepbr
 - Hardware Skinning support via customized Actor shaders
@@ -28,6 +29,8 @@ Game Goal:
 - Receive success message
 
 ![Screenshot from 2021-05-13 06-35-22](https://user-images.githubusercontent.com/3117958/118127627-3127a180-b3b7-11eb-9e24-3ba0bd18852f.png)
+Bloom, HDR, Exposure, and Gamma filtering example:
+![Screenshot from 2021-05-15 04-42-15](https://user-images.githubusercontent.com/3117958/118362592-4c2c1a00-b54d-11eb-807d-488140bc33be.png)
 ![Screenshot from 2021-05-13 06-39-11](https://user-images.githubusercontent.com/3117958/118127681-3f75bd80-b3b7-11eb-9de0-c902521ae374.png)
 ![target_sample](https://user-images.githubusercontent.com/3117958/115130068-87b4e200-9fa9-11eb-9db8-6c0ccb8f44c4.png)
 ![sample_3](https://user-images.githubusercontent.com/3117958/115130069-8a173c00-9fa9-11eb-9b26-10b824866a25.png)

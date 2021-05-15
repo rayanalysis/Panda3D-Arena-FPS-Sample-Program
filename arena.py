@@ -120,8 +120,7 @@ class app(ShowBase):
         # scene_filters.set_volumetric_lighting(plight_1_node, 32, 0.5, 0.7, 0.1)
         # scene_filters.set_blur_sharpen(0.9)
         # scene_filters.set_ambient_occlusion(32, 0.05, 2.0, 0.01, 0.000002)
-        # scene_filters.set_cartoon_ink()
-        
+
         self.accept("f3", self.toggle_wireframe)
         self.accept("escape", sys.exit, [0])
         

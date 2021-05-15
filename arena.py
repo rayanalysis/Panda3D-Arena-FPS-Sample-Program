@@ -108,6 +108,7 @@ class app(ShowBase):
         
         exponential_fog = Fog('world_fog')
         exponential_fog.set_color(0.6, 0.7, 0.7)
+        # this is a very low fog value, set it higher for a greater effect
         exponential_fog.set_exp_density(0.00009)
         self.render.set_fog(exponential_fog)
         

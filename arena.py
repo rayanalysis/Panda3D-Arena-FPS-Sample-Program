@@ -443,8 +443,51 @@ class app(ShowBase):
                         
                     threading2._start_new_thread(npc_cleanup, ())
                             
-        self.accept('mouse1', is_npc_1_shot)                    
+        self.accept('mouse1', is_npc_1_shot)
         
+        def smooth_load_physics():
+             # this is a patch to speed up the cold start hitch on success condition
+             # Bullet node removals
+             self.world.remove(special_node.node())
+             rigid_target = self.render.find('**/d_coll_A')
+             self.world.remove(rigid_target.node())
+             
+        smooth_load_physics()
+        
+        # repeat the NPC physics initialization after smooth_load_physics
+        # create special hit areas
+        # use Task section for npc collision movement logic
+        # special head node size
+        special_shape = BulletBoxShape(Vec3(0.1, 0.1, 0.1))
+        # ghost npc node
+        body = BulletGhostNode('special_node_A')
+        special_node = self.render.attach_new_node(body)
+        special_node.node().add_shape(special_shape, TransformState.makePos(Point3(0, 0, 0.4)))
+        # special_node.node().set_mass(0)
+        # special_node.node().set_friction(0.5)
+        special_node.set_collide_mask(BitMask32(0x0f))
+        # turn on Continuous Collision Detection
+        special_node.node().set_deactivation_enabled(False)
+        special_node.node().set_ccd_motion_threshold(0.000000007)
+        special_node.node().set_ccd_swept_sphere_radius(0.30)
+        self.world.attach_ghost(special_node.node())
+        
+        # dynamic collision
+        special_shape = BulletBoxShape(Vec3(0.3, 0.15, 0.6))
+        # rigidbody npc node
+        body = BulletRigidBodyNode('d_coll_A')
+        d_coll = self.render.attach_new_node(body)
+        d_coll.node().add_shape(special_shape, TransformState.makePos(Point3(0, 0, 0.7)))
+
+        # d_coll.node().set_mass(0)
+        d_coll.node().set_friction(0.5)
+        d_coll.set_collide_mask(BitMask32.allOn())
+        # turn on Continuous Collision Detection
+        d_coll.node().set_deactivation_enabled(False)
+        d_coll.node().set_ccd_motion_threshold(0.000000007)
+        d_coll.node().set_ccd_swept_sphere_radius(0.30)
+        self.world.attach_rigid_body(d_coll.node())
+
         # 3D player movement system begins
         self.keyMap = {"left": 0, "right": 0, "forward": 0, "backward": 0, "run": 0, "jump": 0}
 

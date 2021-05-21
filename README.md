@@ -42,4 +42,4 @@ More screenshots:
 
 Requirements: 
 - Panda3D
-- panda3d-simplepbr-gltf
+- panda3d-gltf

@@ -187,7 +187,7 @@ class app(ShowBase):
 
         # initialize player character physics the Bullet way
         shape_1 = BulletCapsuleShape(0.75, 0.5, ZUp)
-        player_node = BulletCharacterControllerNode(shape_1, 5, 'Player')  # (shape, mass, player name)
+        player_node = BulletCharacterControllerNode(shape_1, 0.1, 'Player')  # (shape, mass, player name)
         player_np = self.render.attach_new_node(player_node)
         player_np.set_pos(-20, -10, 30)
         player_np.set_collide_mask(BitMask32.allOn())

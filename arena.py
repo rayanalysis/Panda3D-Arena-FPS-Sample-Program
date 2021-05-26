@@ -446,11 +446,12 @@ class app(ShowBase):
         self.accept('mouse1', is_npc_1_shot)
         
         def smooth_load_physics():
-             # this is a patch to speed up the cold start hitch on success condition
-             # Bullet node removals
-             self.world.remove(special_node.node())
-             rigid_target = self.render.find('**/d_coll_A')
-             self.world.remove(rigid_target.node())
+            # this is a patch to speed up the cold start hitch on success condition
+            # Bullet node removals
+            self.world.remove(special_node.node())
+            rigid_target = self.render.find('**/d_coll_A')
+            self.world.remove(rigid_target.node())
+            print('NPC physics init cleanup done.')
              
         smooth_load_physics()
         

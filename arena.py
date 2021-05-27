@@ -247,7 +247,7 @@ class app(ShowBase):
         
         # directly make a text node to display text
         text_2 = TextNode('text_2_node')
-        text_2.set_text("Neutralize the NPC by shooting the head." + '\n' + "Press 'f' to toggle the flashlight.")
+        text_2.set_text("Neutralize the NPC by shooting the head." + '\n' + "Press 'f' to toggle the flashlight." + '\n' + "Right-click to jump.")
         text_2_node = self.aspect2d.attach_new_node(text_2)
         text_2_node.set_scale(0.04)
         text_2_node.set_pos(-1.4, 0, 0.8)
@@ -262,6 +262,7 @@ class app(ShowBase):
         # print player position on mouse click
         def print_player_pos():
             print(self.player.get_pos())
+            self.player.node().do_jump()
 
         self.accept('mouse3', print_player_pos)
 
@@ -318,6 +319,13 @@ class app(ShowBase):
             box_model.reparent_to(d_coll)
             box_model.set_color(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
             self.world.attach_rigid_body(d_coll.node())
+            
+        # add a ramp to test out character controller
+        ramp_1 = self.loader.load_model('models/ramp_1.gltf')
+        ramp_1.reparent_to(self.render)
+        ramp_1.set_pos(-20, -5.5, 0)
+        r_pos = ramp_1.get_pos()
+        make_collision_from_model(ramp_1, 0, 0, self.world, (r_pos[0], r_pos[1], r_pos[2] + 1))
         
         # NPC_1 load-in
         comp_shape_1 = BulletCapsuleShape(0.05, 0.01, ZUp)
@@ -512,10 +520,13 @@ class app(ShowBase):
         self.disable_mouse()
 
         # the player movement speed
-        self.movementSpeedForward = 2.5
-        self.movementSpeedBackward = 2.5
-        self.striveSpeed = 3
+        self.movementSpeedForward = 5
+        self.movementSpeedBackward = 5
+        self.dropSpeed = -0.2
+        self.striveSpeed = 6
         self.ease = -10.0
+        self.static_pos_bool = False
+        self.static_pos = Vec3()
 
         def move(Task):
             if self.game_start > 0:
@@ -637,6 +648,9 @@ class app(ShowBase):
                         self.player_gun.show()
 
                 if self.keyMap["left"]:
+                    if self.static_pos_bool:
+                        self.static_pos_bool = False
+                        
                     self.player.set_x(self.player, -self.striveSpeed * globalClock.get_dt())
                     
                     myAnimControl = actor_data.player_character.get_anim_control('walking')
@@ -645,9 +659,18 @@ class app(ShowBase):
                         actor_data.player_character.set_play_rate(4.0, 'walking')
                         
                 if not self.keyMap["left"]:
-                    pass
+                    if not self.static_pos_bool:
+                        self.static_pos_bool = True
+                        self.static_pos = self.player.get_pos()
+                        
+                    self.player.set_x(self.static_pos[0])
+                    self.player.set_y(self.static_pos[1])
+                    self.player.set_z(self.player, self.dropSpeed * globalClock.get_dt())
 
                 if self.keyMap["right"]:
+                    if self.static_pos_bool:
+                        self.static_pos_bool = False
+                        
                     self.player.set_x(self.player, self.striveSpeed * globalClock.get_dt())
                     
                     myAnimControl = actor_data.player_character.get_anim_control('walking')
@@ -656,9 +679,18 @@ class app(ShowBase):
                         actor_data.player_character.set_play_rate(4.0, 'walking')
                         
                 if not self.keyMap["right"]:
-                    pass
+                    if not self.static_pos_bool:
+                        self.static_pos_bool = True
+                        self.static_pos = self.player.get_pos()
+                        
+                    self.player.set_x(self.static_pos[0])
+                    self.player.set_y(self.static_pos[1])
+                    self.player.set_z(self.player, self.dropSpeed * globalClock.get_dt())
 
                 if self.keyMap["forward"]:
+                    if self.static_pos_bool:
+                        self.static_pos_bool = False
+                        
                     self.player.set_y(self.player, self.movementSpeedForward * globalClock.get_dt())
                     
                     myAnimControl = actor_data.player_character.get_anim_control('walking')
@@ -667,9 +699,18 @@ class app(ShowBase):
                         actor_data.player_character.set_play_rate(4.0, 'walking')
                     
                 if self.keyMap["forward"] != 1:
-                    pass
+                    if not self.static_pos_bool:
+                        self.static_pos_bool = True
+                        self.static_pos = self.player.get_pos()
+                        
+                    self.player.set_x(self.static_pos[0])
+                    self.player.set_y(self.static_pos[1])
+                    self.player.set_z(self.player, self.dropSpeed * globalClock.get_dt())
                     
                 if self.keyMap["backward"]:
+                    if self.static_pos_bool:
+                        self.static_pos_bool = False
+                        
                     self.player.set_y(self.player, -self.movementSpeedBackward * globalClock.get_dt())
                     
                     myBackControl = actor_data.player_character.get_anim_control('walking')
@@ -677,10 +718,7 @@ class app(ShowBase):
                         myBackControl.stop()
                         actor_data.player_character.play('walking')
                         actor_data.player_character.set_play_rate(-4.0, 'walking')
-                    
-                if self.keyMap["backward"] != 1:
-                    pass
-                    
+                
             return Task.cont
 
         # infinite ground plane

@@ -5,6 +5,7 @@ Features:
 - First person shooter basic environment
 - First person camera handling system
 - Interactive target dot reticule system
+- Gamepad support
 - Armature with "walking" and "death" animations
 - Bloom, HDR, Exposure, Gamma, Volumetric Lighting, Blur/Sharpen, and Ambient Occlusion support
 - Working blend2bam Actor exporting script

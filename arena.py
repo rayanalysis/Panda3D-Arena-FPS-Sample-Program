@@ -86,7 +86,7 @@ class app(ShowBase):
         
         # begin gamepad initialization
         self.gamepad = None
-        devices = self.devices.getDevices(InputDevice.DeviceClass.gamepad)
+        devices = self.devices.get_devices(InputDevice.DeviceClass.gamepad)
 
         if int(str(devices)[0]) > 0:
             self.gamepad = devices[0]
@@ -109,7 +109,7 @@ class app(ShowBase):
         self.accept("gamepad-face_y-up", do_nothing)
 
         if int(str(devices)[0]) > 0:
-            base.attachInputDevice(self.gamepad, prefix="gamepad")
+            base.attach_input_device(self.gamepad, prefix="gamepad")
             
         self.right_trigger_val = 0.0
         self.left_trigger_val = 0.0

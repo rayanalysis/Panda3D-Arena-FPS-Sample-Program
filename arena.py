@@ -862,8 +862,7 @@ class app(ShowBase):
             if abs(r_stick_right_axis.value) >= 0.15 or abs(r_stick_left_axis.value) >= 0.15:
                 if self.static_pos_bool:
                     self.static_pos_bool = False
-                    
-                # self.camera.set_p(self.camera, xy_speed * dt * r_stick_right_axis.value)
+
                 self.player.set_h(self.player, rotate_speed * dt * -r_stick_left_axis.value)
                 self.player.set_y(self.player, xy_speed * dt * r_stick_right_axis.value)
                 
@@ -878,12 +877,22 @@ class app(ShowBase):
             self.camera.set_r(0)
             self.player.set_r(0)
             
+            min_p = -49
+            max_p = 80
+            
             if abs(l_stick_right_axis.value) >= 0.15 or abs(l_stick_left_axis.value) >= 0.15:
                 if self.static_pos_bool:
                     self.static_pos_bool = False
+                           
+                if self.camera.get_p() < max_p:
+                    if self.camera.get_p() > min_p:
+                        self.camera.set_p(self.camera, p_speed * dt * l_stick_right_axis.value)
+                    if self.camera.get_p() < min_p:
+                        self.camera.set_p(self.camera, p_speed * dt * -l_stick_right_axis.value)
                         
-                # self.player.set_y(self.player, xy_speed * dt * l_stick_right_axis.value)
-                self.camera.set_p(self.camera, p_speed * dt * l_stick_right_axis.value)
+                if self.camera.get_p() >= max_p:
+                    self.camera.set_p(79)
+                    
                 self.player.set_x(self.player, xy_speed * dt * l_stick_left_axis.value)
                 
             if abs(l_stick_right_axis.value) < 0.15 or abs(l_stick_left_axis.value) < 0.15:
@@ -892,6 +901,13 @@ class app(ShowBase):
                     self.static_pos = self.player.get_pos()
                     
                 self.player.set_x(self.static_pos[0])
+                
+            # hide the gun if looking straight down
+            if self.camera.get_p() < -30:
+                self.player_gun.hide()
+            if self.camera.get_p() > -30:
+                self.player_gun.show()
+
 
             return Task.cont
 

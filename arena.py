@@ -44,10 +44,11 @@ from panda3d.core import ConfigVariableManager
 from panda3d.core import FrameBufferProperties
 from panda3d.core import AntialiasAttrib
 from panda3d.core import Fog
+from panda3d.core import InputDevice
 import sys
 import random
 import time
-from panda3d.core import LPoint3f, Point3, Vec3, LVecBase3f, VBase4
+from panda3d.core import LPoint3f, Point3, Vec3, LVecBase3f, VBase4, LPoint2f
 from panda3d.core import WindowProperties
 from direct.showbase.DirectObject import DirectObject
 from direct.interval.IntervalGlobal import *
@@ -64,7 +65,7 @@ class app(ShowBase):
     def __init__(self):
         load_prc_file_data("", """
             win-size 1680 1050
-            window-title Panda3D Arena Sample FPS Bullet Auto Colliders PBR HW Skinning
+            window-title Panda3D Arena FPS Sample Program
             show-frame-rate-meter #t
             framebuffer-srgb #t
             framebuffer-multisample 1
@@ -82,6 +83,37 @@ class app(ShowBase):
         # Initialize the showbase
         super().__init__()
         gltf.patch_loader(self.loader)
+        
+        # begin gamepad initialization
+        self.gamepad = None
+        devices = self.devices.getDevices(InputDevice.DeviceClass.gamepad)
+
+        if int(str(devices)[0]) > 0:
+            self.gamepad = devices[0]
+
+        def do_nothing():
+            print('Something should happen but I cannot effect it.')
+            
+        def gp_exit():
+            sys.exit()[0]
+
+        self.accept("gamepad-back", gp_exit)
+        self.accept("gamepad-start", do_nothing)
+        # self.accept("gamepad-face_x", do_nothing)
+        # self.accept("gamepad-face_x-up", do_nothing)
+        # self.accept("gamepad-face_a", do_nothing)
+        # self.accept("gamepad-face_a-up", do_nothing)
+        self.accept("gamepad-face_b", do_nothing)
+        self.accept("gamepad-face_b-up", do_nothing)
+        self.accept("gamepad-face_y", do_nothing)
+        self.accept("gamepad-face_y-up", do_nothing)
+
+        if int(str(devices)[0]) > 0:
+            base.attachInputDevice(self.gamepad, prefix="gamepad")
+            
+        self.right_trigger_val = 0.0
+        self.left_trigger_val = 0.0
+        # end gamepad intialization
         
         props = WindowProperties()
         props.set_mouse_mode(WindowProperties.M_relative)
@@ -248,6 +280,8 @@ class app(ShowBase):
         # directly make a text node to display text
         text_2 = TextNode('text_2_node')
         text_2.set_text("Neutralize the NPC by shooting the head." + '\n' + "Press 'f' to toggle the flashlight." + '\n' + "Right-click to jump.")
+        if int(str(devices)[0]) > 0:
+            text_2.set_text("Neutralize the NPC by shooting the head." + '\n' + "Press 'X' to toggle the flashlight." + '\n' + "Press 'A' to jump.")
         text_2_node = self.aspect2d.attach_new_node(text_2)
         text_2_node.set_scale(0.04)
         text_2_node.set_pos(-1.4, 0, 0.8)
@@ -265,6 +299,7 @@ class app(ShowBase):
             self.player.node().do_jump()
 
         self.accept('mouse3', print_player_pos)
+        self.accept("gamepad-face_a", print_player_pos)
 
         self.flashlight_state = 0
 
@@ -296,6 +331,7 @@ class app(ShowBase):
                 self.flashlight_state = 0
 
         self.accept('f', toggle_flashlight)
+        self.accept("gamepad-face_x", toggle_flashlight)
         
         # add a few random physics boxes
         for x in range(0, 40):
@@ -450,9 +486,55 @@ class app(ShowBase):
                         self.world.remove(rigid_target.node())
                         
                     threading2._start_new_thread(npc_cleanup, ())
-                            
+                    
         self.accept('mouse1', is_npc_1_shot)
         
+        self.gamepad_npc_cleanup_bool = False
+        
+        def gamepad_trigger_shoot():
+            # animate the gun
+            gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
+            if not gun_ctrl.is_playing():
+                actor_data.arm_handgun.stop()
+                actor_data.arm_handgun.play("shoot")
+                actor_data.arm_handgun.set_play_rate(15.0, 'shoot')
+                
+            # target dot ray test
+            # get mouse data
+            def gamepad_npc_test_cleanup():
+                posMouse = LPoint2f(0, 0)
+                posFrom = Point3()
+                posTo = Point3()
+                base.camLens.extrude(posMouse, posFrom, posTo)
+                posFrom = self.render.get_relative_point(base.cam, posFrom)
+                posTo = self.render.get_relative_point(base.cam, posTo)
+                rayTest = self.world.ray_test_closest(posFrom, posTo)
+                target = rayTest.get_node()
+                target_dot = self.aspect2d.find_all_matches("**/target_dot_node")
+
+                if 'special_node_A' in str(target):
+                    def npc_cleanup():
+                        self.gamepad_npc_cleanup_bool = True
+                        
+                        # the head is hit, the npc is dead
+                        self.npc_1_is_dead = True
+                        text_2.set_text('Congrats, you have won!')
+                        npc_1_control = actor_data.NPC_1.get_anim_control('walking')
+                        if npc_1_control.is_playing():
+                            actor_data.NPC_1.stop()
+                        npc_1_control = actor_data.NPC_1.get_anim_control('death')
+                        if not npc_1_control.is_playing():
+                            actor_data.NPC_1.play('death')
+                        
+                        # Bullet node removals
+                        self.world.remove(target)
+                        rigid_target = self.render.find('**/d_coll_A')
+                        self.world.remove(rigid_target.node())
+                        
+                    threading2._start_new_thread(npc_cleanup, ())
+                    
+            gamepad_npc_test_cleanup()
+            
         def smooth_load_physics():
             # this is a patch to speed up the cold start hitch on success condition
             # Bullet node removals
@@ -528,7 +610,7 @@ class app(ShowBase):
         self.static_pos_bool = False
         self.static_pos = Vec3()
 
-        def move(Task):
+        def move_npc(Task):
             if self.game_start > 0:
                 if not self.npc_1_is_dead:
                     npc_pos_1 = actor_data.NPC_1.get_parent().get_pos()
@@ -557,13 +639,18 @@ class app(ShowBase):
                     inst_h = actor_data.NPC_1.get_h()
                     inst_p = actor_data.NPC_1.get_p()
                     actor_data.NPC_1.set_hpr(inst_h, inst_p, 0)
-                
+                    
+            return Task.cont
+
+        def move(Task):
+            if self.game_start > 0:
                 # target dot ray test
                 # turns the target dot red
                 # get mouse data
                 mouse_watch = base.mouseWatcherNode
                 if mouse_watch.has_mouse():
                     posMouse = base.mouseWatcherNode.get_mouse()
+                    # print(posMouse)
                     posFrom = Point3()
                     posTo = Point3()
                     base.camLens.extrude(posMouse, posFrom, posTo)
@@ -588,7 +675,7 @@ class app(ShowBase):
                         if 'd_coll_A' not in str(target):
                             for dot in target_dot:
                                 dot.node().set_text_color(1, 1, 1, 1)
-                            
+                                
                 # get mouse data
                 mouse_watch = base.mouseWatcherNode
                 if mouse_watch.has_mouse():
@@ -720,6 +807,93 @@ class app(ShowBase):
                         actor_data.player_character.set_play_rate(-4.0, 'walking')
                 
             return Task.cont
+            
+        def gp_move(Task):
+            if self.game_start > 0:
+                def gamepad_mouse_test():
+                    posMouse = LPoint2f(0, 0)
+                    posFrom = Point3()
+                    posTo = Point3()
+                    base.camLens.extrude(posMouse, posFrom, posTo)
+                    posFrom = self.render.get_relative_point(base.cam, posFrom)
+                    posTo = self.render.get_relative_point(base.cam, posTo)
+                    rayTest = self.world.ray_test_closest(posFrom, posTo)
+                    target = rayTest.get_node()
+                    target_dot = self.aspect2d.find_all_matches("**/target_dot_node")
+
+                    if 'special_node_A' in str(target):
+                        # the npc is recognized, make the dot red
+                        for dot in target_dot:
+                            dot.node().set_text_color(0.9, 0.1, 0.1, 1)
+                            
+                    if 'd_coll_A' in str(target):
+                        # the npc is recognized, make the dot red
+                        for dot in target_dot:
+                            dot.node().set_text_color(0.9, 0.1, 0.1, 1)
+                    
+                    if 'special_node_A' not in str(target):
+                        # no npc recognized, make the dot white
+                        if 'd_coll_A' not in str(target):
+                            for dot in target_dot:
+                                dot.node().set_text_color(1, 1, 1, 1)
+                                
+                gamepad_mouse_test()
+                        
+            dt = globalClock.get_dt()
+            
+            right_trigger = self.gamepad.find_axis(InputDevice.Axis.right_trigger)
+            left_trigger = self.gamepad.find_axis(InputDevice.Axis.left_trigger)
+            self.right_trigger_val = right_trigger.value
+            self.left_trigger_val = left_trigger.value
+            
+            if self.right_trigger_val > 0.2:
+                if not self.gamepad_npc_cleanup_bool:
+                    gamepad_trigger_shoot()
+            
+            xy_speed = 12
+            p_speed = 30
+            rotate_speed = 100
+                
+            r_stick_right_axis = self.gamepad.find_axis(InputDevice.Axis.left_y)
+            r_stick_left_axis = self.gamepad.find_axis(InputDevice.Axis.left_x)
+            l_stick_right_axis = self.gamepad.find_axis(InputDevice.Axis.right_y)
+            l_stick_left_axis = self.gamepad.find_axis(InputDevice.Axis.right_x)
+
+            if abs(r_stick_right_axis.value) >= 0.15 or abs(r_stick_left_axis.value) >= 0.15:
+                if self.static_pos_bool:
+                    self.static_pos_bool = False
+                    
+                # self.camera.set_p(self.camera, xy_speed * dt * r_stick_right_axis.value)
+                self.player.set_h(self.player, rotate_speed * dt * -r_stick_left_axis.value)
+                self.player.set_y(self.player, xy_speed * dt * r_stick_right_axis.value)
+                
+            if abs(r_stick_right_axis.value) < 0.15 or abs(r_stick_left_axis.value) < 0.15:
+                if not self.static_pos_bool:
+                    self.static_pos_bool = True
+                    self.static_pos = self.player.get_pos()
+                    
+                self.player.set_y(self.static_pos[1])
+
+            # reset camera roll
+            self.camera.set_r(0)
+            self.player.set_r(0)
+            
+            if abs(l_stick_right_axis.value) >= 0.15 or abs(l_stick_left_axis.value) >= 0.15:
+                if self.static_pos_bool:
+                    self.static_pos_bool = False
+                        
+                # self.player.set_y(self.player, xy_speed * dt * l_stick_right_axis.value)
+                self.camera.set_p(self.camera, p_speed * dt * l_stick_right_axis.value)
+                self.player.set_x(self.player, xy_speed * dt * l_stick_left_axis.value)
+                
+            if abs(l_stick_right_axis.value) < 0.15 or abs(l_stick_left_axis.value) < 0.15:
+                if not self.static_pos_bool:
+                    self.static_pos_bool = True
+                    self.static_pos = self.player.get_pos()
+                    
+                self.player.set_x(self.static_pos[0])
+
+            return Task.cont
 
         # infinite ground plane
         # the effective world-Z limit
@@ -759,10 +933,15 @@ class app(ShowBase):
             dt = globalClock.get_dt()
             self.world.do_physics(dt)
             return Task.cont
-
-        self.task_mgr.add(move)
+            
+        if self.gamepad is None:
+            self.task_mgr.add(move)
+            
+        if int(str(devices)[0]) > 0:
+            self.task_mgr.add(gp_move)
+            
         self.task_mgr.add(update)
+        self.task_mgr.add(move_npc)
         self.task_mgr.add(physics_update)
 
 app().run()
-

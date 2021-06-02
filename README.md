@@ -29,10 +29,8 @@ Game Goal:
 - Neutralize the NPC by shooting the head hitbox
 - Receive success message
 
+![skinpad_update](https://user-images.githubusercontent.com/3117958/120416307-2dce6880-c31a-11eb-9155-128e83521549.png)
 ![Screenshot from 2021-05-13 06-35-22](https://user-images.githubusercontent.com/3117958/118127627-3127a180-b3b7-11eb-9e24-3ba0bd18852f.png)
-Bloom, HDR, Exposure, and Gamma filtering examples:
-![Screenshot from 2021-05-15 04-42-15](https://user-images.githubusercontent.com/3117958/118362592-4c2c1a00-b54d-11eb-807d-488140bc33be.png)
-![Screenshot from 2021-05-15 05-04-33](https://user-images.githubusercontent.com/3117958/118362930-299b0080-b54f-11eb-94ec-93b6226a0931.png)
 Volumetric Lighting at default values:
 ![Screenshot from 2021-05-15 05-19-20](https://user-images.githubusercontent.com/3117958/118362946-3e779400-b54f-11eb-9130-b38c0ac7cc5d.png)
 More screenshots:

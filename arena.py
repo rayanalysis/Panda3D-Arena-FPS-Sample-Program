@@ -113,7 +113,7 @@ class app(ShowBase):
             
         self.right_trigger_val = 0.0
         self.left_trigger_val = 0.0
-        # end gamepad intialization
+        # end gamepad initialization
         
         props = WindowProperties()
         props.set_mouse_mode(WindowProperties.M_relative)

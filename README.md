@@ -17,7 +17,8 @@ Features:
 - State machine based onscreen text updating
 - Toggle based flashlight with shadow casting
 - Modern .gltf and .bam based modeling
-- Very basic NPC movement system 
+- Very basic NPC movement system
+- Jumping and slope physics support 
 
 Included Full Assets:
 - Handgun model with Blender file

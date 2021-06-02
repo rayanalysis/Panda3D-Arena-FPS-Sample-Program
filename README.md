@@ -32,11 +32,7 @@ Game Goal:
 ![skinpad_update](https://user-images.githubusercontent.com/3117958/120416307-2dce6880-c31a-11eb-9155-128e83521549.png)
 Volumetric Lighting at default values:
 ![Screenshot from 2021-05-15 05-19-20](https://user-images.githubusercontent.com/3117958/118362946-3e779400-b54f-11eb-9130-b38c0ac7cc5d.png)
-More screenshots:
-![Screenshot from 2021-05-13 06-39-11](https://user-images.githubusercontent.com/3117958/118127681-3f75bd80-b3b7-11eb-9de0-c902521ae374.png)
-![target_sample](https://user-images.githubusercontent.com/3117958/115130068-87b4e200-9fa9-11eb-9db8-6c0ccb8f44c4.png)
 ![sample_3](https://user-images.githubusercontent.com/3117958/115130069-8a173c00-9fa9-11eb-9b26-10b824866a25.png)
-![target_dot_sample](https://user-images.githubusercontent.com/3117958/115130071-8c799600-9fa9-11eb-9084-2f7c3352852d.png)
 
 Requirements: 
 - Panda3D

@@ -532,8 +532,9 @@ class app(ShowBase):
                         self.world.remove(rigid_target.node())
                         
                     threading2._start_new_thread(npc_cleanup, ())
-                    
-            gamepad_npc_test_cleanup()
+            
+            if not self.gamepad_npc_cleanup_bool:
+                gamepad_npc_test_cleanup()
             
         def smooth_load_physics():
             # this is a patch to speed up the cold start hitch on success condition
@@ -847,8 +848,7 @@ class app(ShowBase):
             self.left_trigger_val = left_trigger.value
             
             if self.right_trigger_val > 0.2:
-                if not self.gamepad_npc_cleanup_bool:
-                    gamepad_trigger_shoot()
+                gamepad_trigger_shoot()
             
             xy_speed = 12
             p_speed = 30

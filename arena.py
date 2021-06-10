@@ -913,7 +913,6 @@ class app(ShowBase):
             if self.camera.get_p() > -30:
                 self.player_gun.show()
 
-
             return Task.cont
 
         # infinite ground plane

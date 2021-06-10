@@ -67,8 +67,10 @@ class app(ShowBase):
             win-size 1680 1050
             window-title Panda3D Arena FPS Sample Program
             show-frame-rate-meter #t
-            framebuffer-srgb #t
             framebuffer-multisample 1
+            depth-bits 24
+            color-bits 3
+            alpha-bits 1
             multisamples 4
             view-frustum-cull 0
             textures-power-2 none
@@ -83,6 +85,11 @@ class app(ShowBase):
         # Initialize the showbase
         super().__init__()
         gltf.patch_loader(self.loader)
+        
+        fb_props = FrameBufferProperties()
+        fb_props.float_color = True
+        fb_props.set_rgba_bits(16, 16, 16, 16)
+        fb_props.set_depth_bits(24)
         
         # begin gamepad initialization
         self.gamepad = None
@@ -128,7 +135,7 @@ class app(ShowBase):
         # ConfigVariableManager.getGlobalPtr().listVariables()
         
         # point light generator
-        for x in range(0, 3):
+        for x in range(5):
             plight_1 = PointLight('plight')
             # add plight props here
             plight_1_node = self.render.attach_new_node(plight_1)
@@ -452,7 +459,7 @@ class app(ShowBase):
             if not gun_ctrl.is_playing():
                 actor_data.arm_handgun.stop()
                 actor_data.arm_handgun.play("shoot")
-                actor_data.arm_handgun.set_play_rate(15.0, 'shoot')
+                actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
             
             # target dot ray test
             # get mouse data
@@ -497,7 +504,7 @@ class app(ShowBase):
             if not gun_ctrl.is_playing():
                 actor_data.arm_handgun.stop()
                 actor_data.arm_handgun.play("shoot")
-                actor_data.arm_handgun.set_play_rate(15.0, 'shoot')
+                actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
                 
             # target dot ray test
             # get mouse data
@@ -610,12 +617,6 @@ class app(ShowBase):
         self.ease = -10.0
         self.static_pos_bool = False
         self.static_pos = Vec3()
-        
-        def animate_player():
-            myAnimControl = actor_data.player_character.get_anim_control('walking')
-            if not myAnimControl.isPlaying():
-                actor_data.player_character.play("walking")
-                actor_data.player_character.set_play_rate(4.0, 'walking')
 
         def move_npc(Task):
             if self.game_start > 0:
@@ -741,15 +742,16 @@ class app(ShowBase):
                     if p > -30:
                         self.player_gun.show()
 
-
-
                 if self.keyMap["left"]:
                     if self.static_pos_bool:
                         self.static_pos_bool = False
                         
                     self.player.set_x(self.player, -self.striveSpeed * globalClock.get_dt())
                     
-                    animate_player()
+                    myAnimControl = actor_data.player_character.get_anim_control('walking')
+                    if not myAnimControl.isPlaying():
+                        actor_data.player_character.play("walking")
+                        actor_data.player_character.set_play_rate(4.0, 'walking')
                         
                 if not self.keyMap["left"]:
                     if not self.static_pos_bool:
@@ -766,7 +768,10 @@ class app(ShowBase):
                         
                     self.player.set_x(self.player, self.striveSpeed * globalClock.get_dt())
                     
-                    animate_player()
+                    myAnimControl = actor_data.player_character.get_anim_control('walking')
+                    if not myAnimControl.isPlaying():
+                        actor_data.player_character.play("walking")
+                        actor_data.player_character.set_play_rate(4.0, 'walking')
                         
                 if not self.keyMap["right"]:
                     if not self.static_pos_bool:
@@ -783,7 +788,10 @@ class app(ShowBase):
                         
                     self.player.set_y(self.player, self.movementSpeedForward * globalClock.get_dt())
                     
-                    animate_player()
+                    myAnimControl = actor_data.player_character.get_anim_control('walking')
+                    if not myAnimControl.isPlaying():
+                        actor_data.player_character.play("walking")
+                        actor_data.player_character.set_play_rate(4.0, 'walking')
                     
                 if self.keyMap["forward"] != 1:
                     if not self.static_pos_bool:
@@ -800,7 +808,11 @@ class app(ShowBase):
                         
                     self.player.set_y(self.player, -self.movementSpeedBackward * globalClock.get_dt())
                     
-                    animate_player()
+                    myBackControl = actor_data.player_character.get_anim_control('walking')
+                    if not myBackControl.isPlaying():
+                        myBackControl.stop()
+                        actor_data.player_character.play('walking')
+                        actor_data.player_character.set_play_rate(-4.0, 'walking')
                 
             return Task.cont
             
@@ -834,7 +846,7 @@ class app(ShowBase):
                                 dot.node().set_text_color(1, 1, 1, 1)
                                 
                 gamepad_mouse_test()
-            
+                        
             dt = globalClock.get_dt()
             
             right_trigger = self.gamepad.find_axis(InputDevice.Axis.right_trigger)
@@ -860,8 +872,6 @@ class app(ShowBase):
 
                 self.player.set_h(self.player, rotate_speed * dt * -r_stick_left_axis.value)
                 self.player.set_y(self.player, xy_speed * dt * r_stick_right_axis.value)
-                
-                animate_player()
                 
             if abs(r_stick_right_axis.value) < 0.15 or abs(r_stick_left_axis.value) < 0.15:
                 if not self.static_pos_bool:
@@ -891,8 +901,6 @@ class app(ShowBase):
                     self.camera.set_p(79)
                     
                 self.player.set_x(self.player, xy_speed * dt * l_stick_left_axis.value)
-                
-                animate_player()
                 
             if abs(l_stick_right_axis.value) < 0.15 or abs(l_stick_left_axis.value) < 0.15:
                 if not self.static_pos_bool:

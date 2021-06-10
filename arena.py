@@ -764,7 +764,7 @@ class app(ShowBase):
                         
                     self.player.set_x(self.static_pos[0])
                     self.player.set_y(self.static_pos[1])
-                    self.player.set_z(self.player, self.dropSpeed * globalClock.get_dt())
+                    # self.player.set_z(self.player, self.dropSpeed * globalClock.get_dt())
 
                 if self.keyMap["right"]:
                     if self.static_pos_bool:
@@ -781,7 +781,7 @@ class app(ShowBase):
                         
                     self.player.set_x(self.static_pos[0])
                     self.player.set_y(self.static_pos[1])
-                    self.player.set_z(self.player, self.dropSpeed * globalClock.get_dt())
+                    # self.player.set_z(self.player, self.dropSpeed * globalClock.get_dt())
 
                 if self.keyMap["forward"]:
                     if self.static_pos_bool:
@@ -798,7 +798,7 @@ class app(ShowBase):
                         
                     self.player.set_x(self.static_pos[0])
                     self.player.set_y(self.static_pos[1])
-                    self.player.set_z(self.player, self.dropSpeed * globalClock.get_dt())
+                    # self.player.set_z(self.player, self.dropSpeed * globalClock.get_dt())
                     
                 if self.keyMap["backward"]:
                     if self.static_pos_bool:

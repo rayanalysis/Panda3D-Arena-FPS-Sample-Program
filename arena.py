@@ -154,7 +154,7 @@ class app(ShowBase):
         scene_filters = CommonFilters(base.win, base.cam)
         scene_filters.set_bloom()
         scene_filters.set_high_dynamic_range()
-        scene_filters.set_exposure_adjust(0.6)
+        scene_filters.set_exposure_adjust(1.1)
         scene_filters.set_gamma_adjust(1.1)
         # scene_filters.set_volumetric_lighting(plight_1_node, 64, 0.2, 0.7, 0.01)
         # scene_filters.set_blur_sharpen(0.9)

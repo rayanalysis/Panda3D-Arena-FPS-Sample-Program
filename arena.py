@@ -454,12 +454,14 @@ class app(ShowBase):
         threading2._start_new_thread(npc_1_move_gen, ())
         
         def is_npc_1_shot():
-            # animate the gun
-            gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
-            if not gun_ctrl.is_playing():
-                actor_data.arm_handgun.stop()
-                actor_data.arm_handgun.play("shoot")
-                actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
+            async def gun_anim():
+                gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
+                if not gun_ctrl.is_playing():
+                    actor_data.arm_handgun.stop()
+                    actor_data.arm_handgun.play("shoot")
+                    actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
+            
+            base.taskMgr.add(gun_anim())
             
             # target dot ray test
             # get mouse data
@@ -476,7 +478,7 @@ class app(ShowBase):
                 target_dot = self.aspect2d.find_all_matches("**/target_dot_node")
 
                 if 'special_node_A' in str(target):
-                    def npc_cleanup():
+                    async def npc_cleanup():
                         # the head is hit, the npc is dead
                         self.npc_1_is_dead = True
                         text_2.set_text('Congrats, you have won!')
@@ -492,7 +494,7 @@ class app(ShowBase):
                         rigid_target = self.render.find('**/d_coll_A')
                         self.world.remove(rigid_target.node())
                         
-                    threading2._start_new_thread(npc_cleanup, ())
+                    base.taskMgr.add(npc_cleanup())
                     
         self.accept('mouse1', is_npc_1_shot)
         

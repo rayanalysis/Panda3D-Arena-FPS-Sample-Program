@@ -453,7 +453,59 @@ class app(ShowBase):
         # activate the movement timer in a dedicated thread to prevent lockup with .sleep()
         threading2._start_new_thread(npc_1_move_gen, ())
         
-        def is_npc_1_shot():
+        self.use_seq_cleanup = True
+        self.use_async_cleanup = False
+        
+        def is_npc_1_shot_seq():
+            def gun_anim():
+                gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
+                if not gun_ctrl.is_playing():
+                    actor_data.arm_handgun.stop()
+                    actor_data.arm_handgun.play("shoot")
+                    actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
+            
+            seq = Sequence()
+            seq.append(Func(gun_anim))
+            seq.append(Wait(0.2))
+            
+            # target dot ray test
+            # get mouse data
+            mouse_watch = base.mouseWatcherNode
+            if mouse_watch.has_mouse():
+                posMouse = base.mouseWatcherNode.get_mouse()
+                posFrom = Point3()
+                posTo = Point3()
+                base.camLens.extrude(posMouse, posFrom, posTo)
+                posFrom = self.render.get_relative_point(base.cam, posFrom)
+                posTo = self.render.get_relative_point(base.cam, posTo)
+                rayTest = self.world.ray_test_closest(posFrom, posTo)
+                target = rayTest.get_node()
+                target_dot = self.aspect2d.find_all_matches("**/target_dot_node")
+
+                if 'special_node_A' in str(target):
+                    def npc_cleanup():
+                        # the head is hit, the npc is dead
+                        self.npc_1_is_dead = True
+                        text_2.set_text('Congrats, you have won!')
+                        npc_1_control = actor_data.NPC_1.get_anim_control('walking')
+                        if npc_1_control.is_playing():
+                            actor_data.NPC_1.stop()
+                        npc_1_control = actor_data.NPC_1.get_anim_control('death')
+                        if not npc_1_control.is_playing():
+                            actor_data.NPC_1.play('death')
+                        
+                        # Bullet node removals
+                        self.world.remove(target)
+                        rigid_target = self.render.find('**/d_coll_A')
+                        self.world.remove(rigid_target.node())
+                        
+                    seq.append(Func(npc_cleanup))
+                    seq.start()
+                    
+                else:
+                    seq.start()
+                    
+        def is_npc_1_shot_async():
             async def gun_anim():
                 gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
                 if not gun_ctrl.is_playing():
@@ -495,18 +547,26 @@ class app(ShowBase):
                         self.world.remove(rigid_target.node())
                         
                     base.taskMgr.add(npc_cleanup())
-                    
-        self.accept('mouse1', is_npc_1_shot)
+        
+        if self.use_seq_cleanup:
+            self.accept('mouse1', is_npc_1_shot_seq)
+            
+        elif self.use_async_cleanup:
+            self.accept('mouse1', is_npc_1_shot_async)
         
         self.gamepad_npc_cleanup_bool = False
         
-        def gamepad_trigger_shoot():
-            # animate the gun
-            gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
-            if not gun_ctrl.is_playing():
-                actor_data.arm_handgun.stop()
-                actor_data.arm_handgun.play("shoot")
-                actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
+        def gamepad_trigger_shoot_seq():
+            def gun_anim():
+                gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
+                if not gun_ctrl.is_playing():
+                    actor_data.arm_handgun.stop()
+                    actor_data.arm_handgun.play("shoot")
+                    actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
+            
+            seq = Sequence()
+            seq.append(Func(gun_anim))
+            seq.append(Wait(0.2))
                 
             # target dot ray test
             # get mouse data
@@ -523,8 +583,6 @@ class app(ShowBase):
 
                 if 'special_node_A' in str(target):
                     def npc_cleanup():
-                        self.gamepad_npc_cleanup_bool = True
-                        
                         # the head is hit, the npc is dead
                         self.npc_1_is_dead = True
                         text_2.set_text('Congrats, you have won!')
@@ -540,7 +598,56 @@ class app(ShowBase):
                         rigid_target = self.render.find('**/d_coll_A')
                         self.world.remove(rigid_target.node())
                         
-                    threading2._start_new_thread(npc_cleanup, ())
+                    seq.append(Func(npc_cleanup))
+                    seq.start()
+                    
+                else:
+                    seq.start()
+            
+            if not self.gamepad_npc_cleanup_bool:
+                gamepad_npc_test_cleanup()
+                
+        def gamepad_trigger_shoot_async():
+            async def gun_anim():
+                gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
+                if not gun_ctrl.is_playing():
+                    actor_data.arm_handgun.stop()
+                    actor_data.arm_handgun.play("shoot")
+                    actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
+            
+            base.taskMgr.add(gun_anim())
+                
+            # target dot ray test
+            # get mouse data
+            def gamepad_npc_test_cleanup():
+                posMouse = LPoint2f(0, 0)
+                posFrom = Point3()
+                posTo = Point3()
+                base.camLens.extrude(posMouse, posFrom, posTo)
+                posFrom = self.render.get_relative_point(base.cam, posFrom)
+                posTo = self.render.get_relative_point(base.cam, posTo)
+                rayTest = self.world.ray_test_closest(posFrom, posTo)
+                target = rayTest.get_node()
+                target_dot = self.aspect2d.find_all_matches("**/target_dot_node")
+
+                if 'special_node_A' in str(target):
+                    async def npc_cleanup():
+                        # the head is hit, the npc is dead
+                        self.npc_1_is_dead = True
+                        text_2.set_text('Congrats, you have won!')
+                        npc_1_control = actor_data.NPC_1.get_anim_control('walking')
+                        if npc_1_control.is_playing():
+                            actor_data.NPC_1.stop()
+                        npc_1_control = actor_data.NPC_1.get_anim_control('death')
+                        if not npc_1_control.is_playing():
+                            actor_data.NPC_1.play('death')
+                        
+                        # Bullet node removals
+                        self.world.remove(target)
+                        rigid_target = self.render.find('**/d_coll_A')
+                        self.world.remove(rigid_target.node())
+                        
+                    base.taskMgr.add(npc_cleanup())
             
             if not self.gamepad_npc_cleanup_bool:
                 gamepad_npc_test_cleanup()
@@ -851,7 +958,11 @@ class app(ShowBase):
             self.left_trigger_val = left_trigger.value
             
             if self.right_trigger_val > 0.2:
-                gamepad_trigger_shoot()
+                if self.use_seq_cleanup:
+                    gamepad_trigger_shoot_seq()
+                    
+                elif self.use_async_cleanup:
+                    gamepad_trigger_shoot_async()
             
             xy_speed = 12
             p_speed = 30

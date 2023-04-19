@@ -30,11 +30,6 @@ Game Goal:
 - Neutralize the NPC by shooting the head hitbox
 - Receive success message
 
-![skinpad_update](https://user-images.githubusercontent.com/3117958/120416307-2dce6880-c31a-11eb-9155-128e83521549.png)
-Volumetric Lighting at default values:
-![Screenshot from 2021-05-15 05-19-20](https://user-images.githubusercontent.com/3117958/118362946-3e779400-b54f-11eb-9130-b38c0ac7cc5d.png)
-![sample_3](https://user-images.githubusercontent.com/3117958/115130069-8a173c00-9fa9-11eb-9b26-10b824866a25.png)
-
 Requirements: 
 - Panda3D
 - panda3d-gltf

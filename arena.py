@@ -55,8 +55,6 @@ from direct.interval.IntervalGlobal import *
 # gui imports
 from direct.gui.DirectGui import *
 from panda3d.core import TextNode
-# new pbr imports
-import gltf
 # local imports
 import actor_data
 
@@ -84,7 +82,6 @@ class app(ShowBase):
 
         # Initialize the showbase
         super().__init__()
-        gltf.patch_loader(self.loader)
         
         fb_props = FrameBufferProperties()
         fb_props.float_color = True

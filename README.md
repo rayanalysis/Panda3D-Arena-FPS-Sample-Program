@@ -32,3 +32,16 @@ This is a modern Panda3D sample program with an Arena first person shooter envir
 ## Requirements: 
 - panda3d
 - panda3d-complexpbr
+
+## Screenshots
+![arena_screen-Sun-Jun-25-16-17-28-2023-6262](https://github.com/rayanalysis/Panda3D-Arena-FPS-Sample-Program/assets/3117958/1f89e6e5-2221-41df-ad13-2fdc8a03200a)
+
+![arena_screen-Sun-Jun-25-16-11-44-2023-432](https://github.com/rayanalysis/Panda3D-Arena-FPS-Sample-Program/assets/3117958/9e91f710-bf5f-4317-a1cc-d094c33c2a4d)
+
+![arena_screen-Sun-Jun-25-16-13-14-2023-1934](https://github.com/rayanalysis/Panda3D-Arena-FPS-Sample-Program/assets/3117958/13614ca2-2b2d-4a3d-93d1-50812426f257)
+
+![arena_screen-Sun-Jun-25-16-13-49-2023-2504](https://github.com/rayanalysis/Panda3D-Arena-FPS-Sample-Program/assets/3117958/ddc7c84a-103b-46ac-bc44-41cf1a6308f0)
+
+![arena_screen-Sun-Jun-25-16-13-58-2023-2659](https://github.com/rayanalysis/Panda3D-Arena-FPS-Sample-Program/assets/3117958/84e64bec-d21d-48e3-be85-f7c94107b6dd)
+
+

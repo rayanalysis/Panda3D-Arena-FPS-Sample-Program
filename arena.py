@@ -91,6 +91,11 @@ class app(ShowBase):
 
         self.accept_once('m', quality_mode)
         self.accept_once("gamepad-face_y", quality_mode)
+
+        def save_screen():
+            base.screenshot('arena_screen')
+            
+        self.accept('o', save_screen)
         
         # window props
         props = WindowProperties()

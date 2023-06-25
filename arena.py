@@ -32,63 +32,82 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from direct.showbase.ShowBase import ShowBase
 from direct.stdpy import threading2
-from direct.filter.CommonFilters import CommonFilters
-from panda3d.core import load_prc_file_data
-from panda3d.core import BitMask32
-from panda3d.core import Shader, ShaderAttrib
-from panda3d.core import TransformState
-from panda3d.core import PointLight
-from panda3d.core import Spotlight
-from panda3d.core import PerspectiveLens
-from panda3d.core import ConfigVariableManager
-from panda3d.core import FrameBufferProperties
-from panda3d.core import AntialiasAttrib
-from panda3d.core import Fog
-from panda3d.core import InputDevice
+from panda3d.core import load_prc_file_data, BitMask32, TransformState, ConfigVariableManager
+from panda3d.core import FrameBufferProperties, AntialiasAttrib, InputDevice, Texture
 import sys
 import random
 import time
-from panda3d.core import LPoint3f, Point3, Vec3, LVecBase3f, VBase4, LPoint2f
+from panda3d.core import LPoint3f, Point3, Vec3, Vec4, LVecBase3f, VBase4, LPoint2f
 from panda3d.core import WindowProperties
 from direct.showbase.DirectObject import DirectObject
 from direct.interval.IntervalGlobal import *
 # gui imports
 from direct.gui.DirectGui import *
 from panda3d.core import TextNode
+# new pbr imports
+import complexpbr
 # local imports
 import actor_data
+import arena_lighting
 
 
 class app(ShowBase):
     def __init__(self):
         load_prc_file_data("", """
-            win-size 1680 1050
-            window-title Panda3D Arena FPS Sample Program
-            show-frame-rate-meter #t
+            win-size 1920 1080
+            window-title complexpbr Demo
             framebuffer-multisample 1
-            depth-bits 24
-            color-bits 3
-            alpha-bits 1
             multisamples 4
-            view-frustum-cull 0
-            textures-power-2 none
             hardware-animated-vertices #t
-            gl-depth-zero-to-one true
-            clock-frame-rate 60
-            interpolate-frames 1
             cursor-hidden #t
-            fullscreen #f
         """)
 
-        # Initialize the showbase
+        # initialize the showbase
         super().__init__()
+
+        # lighting
+        arena_lighting.lighting()
+        arena_lighting.init_flashlight()
+        self.accept('f', arena_lighting.toggle_flashlight)
+        self.accept("gamepad-face_x", arena_lighting.toggle_flashlight)
+
+        # complexpbr
+        complexpbr.apply_shader(self.render)
+
+        def quality_mode():
+            complexpbr.screenspace_init()
         
-        fb_props = FrameBufferProperties()
-        fb_props.float_color = True
-        fb_props.set_rgba_bits(16, 16, 16, 16)
-        fb_props.set_depth_bits(24)
+            base.screen_quad.set_shader_input("bloom_intensity", 0.3)
+            base.screen_quad.set_shader_input("bloom_threshold", 0.7)
+            base.screen_quad.set_shader_input("bloom_blur_width", 10)
+            base.screen_quad.set_shader_input("bloom_samples", 6)
+            base.screen_quad.set_shader_input('ssr_samples', 0)
+            base.screen_quad.set_shader_input('ssao_samples', 6)
+            base.screen_quad.set_shader_input('hsv_r', 1.0)
+            base.screen_quad.set_shader_input('hsv_g', 1.1)
+            base.screen_quad.set_shader_input('hsv_b', 1.0)
+
+            text_1.set_text("Quality Mode: On")
+
+        self.accept_once('m', quality_mode)
+        self.accept_once("gamepad-face_y", quality_mode)
         
-        # begin gamepad initialization
+        # window props
+        props = WindowProperties()
+        props.set_mouse_mode(WindowProperties.M_relative)
+        base.win.request_properties(props)
+        base.set_background_color(0.5, 0.5, 0.8)
+        
+        self.camLens.set_fov(90)
+        self.camLens.set_near_far(0.1, 5000)
+        # ConfigVariableManager.getGlobalPtr().listVariables()
+
+        self.accept("f3", self.toggle_wireframe)
+        self.accept("escape", sys.exit, [0])
+        
+        self.game_start = 0
+        
+        # gamepad initialization
         self.gamepad = None
         devices = self.devices.get_devices(InputDevice.DeviceClass.gamepad)
 
@@ -109,8 +128,8 @@ class app(ShowBase):
         # self.accept("gamepad-face_a-up", do_nothing)
         self.accept("gamepad-face_b", do_nothing)
         self.accept("gamepad-face_b-up", do_nothing)
-        self.accept("gamepad-face_y", do_nothing)
-        self.accept("gamepad-face_y-up", do_nothing)
+        # self.accept("gamepad-face_y", do_nothing)
+        # self.accept("gamepad-face_y-up", do_nothing)
 
         if int(str(devices)[0]) > 0:
             base.attach_input_device(self.gamepad, prefix="gamepad")
@@ -118,63 +137,15 @@ class app(ShowBase):
         self.right_trigger_val = 0.0
         self.left_trigger_val = 0.0
         # end gamepad initialization
-        
-        props = WindowProperties()
-        props.set_mouse_mode(WindowProperties.M_relative)
-        base.win.request_properties(props)
-        base.set_background_color(0.5, 0.5, 0.8)
-        
-        self.camLens.set_fov(80)
-        self.camLens.set_near_far(0.01, 90000)
-        self.camLens.set_focal_length(7)
-        # self.camera.set_pos(0, 0, 2)
-        
-        # ConfigVariableManager.getGlobalPtr().listVariables()
-        
-        # point light generator
-        for x in range(5):
-            plight_1 = PointLight('plight')
-            # add plight props here
-            plight_1_node = self.render.attach_new_node(plight_1)
-            # group the lights close to each other to create a sun effect
-            plight_1_node.set_pos(random.uniform(-21, -20), random.uniform(-21, -20), random.uniform(20, 21))
-            self.render.set_light(plight_1_node)
-        
-        # point light for volumetric lighting filter
-        plight_1 = PointLight('plight')
-        # add plight props here
-        plight_1_node = self.render.attach_new_node(plight_1)
-        # group the lights close to each other to create a sun effect
-        plight_1_node.set_pos(random.uniform(-21, -20), random.uniform(-21, -20), random.uniform(20, 21))
-        self.render.set_light(plight_1_node)
-        
-        scene_filters = CommonFilters(base.win, base.cam)
-        scene_filters.set_bloom()
-        scene_filters.set_high_dynamic_range()
-        scene_filters.set_exposure_adjust(1.1)
-        scene_filters.set_gamma_adjust(1.1)
-        # scene_filters.set_volumetric_lighting(plight_1_node, 64, 0.2, 0.7, 0.01)
-        # scene_filters.set_blur_sharpen(0.9)
-        # scene_filters.set_ambient_occlusion(32, 0.05, 2.0, 0.01, 0.000002)
 
-        self.accept("f3", self.toggle_wireframe)
-        self.accept("escape", sys.exit, [0])
-        
-        exponential_fog = Fog('world_fog')
-        exponential_fog.set_color(0.6, 0.7, 0.7)
-        # this is a very low fog value, set it higher for a greater effect
-        exponential_fog.set_exp_density(0.00009)
-        self.render.set_fog(exponential_fog)
-        
-        self.game_start = 0
-        
+        # begin physics environment
         from panda3d.bullet import BulletWorld
         from panda3d.bullet import BulletCharacterControllerNode
         from panda3d.bullet import ZUp
         from panda3d.bullet import BulletCapsuleShape
         from panda3d.bullet import BulletTriangleMesh
         from panda3d.bullet import BulletTriangleMeshShape
-        from panda3d.bullet import BulletBoxShape
+        from panda3d.bullet import BulletBoxShape, BulletSphereShape
         from panda3d.bullet import BulletGhostNode
         from panda3d.bullet import BulletRigidBodyNode
         from panda3d.bullet import BulletPlaneShape
@@ -214,13 +185,6 @@ class app(ShowBase):
         
         make_collision_from_model(arena_1, 0, 0, self.world, (arena_1.get_pos()))
 
-        # load the scene shader
-        scene_shader = Shader.load(Shader.SL_GLSL, "shaders/simplepbr_vert_mod_1.vert", "shaders/simplepbr_frag_mod_1.frag")
-        self.render.set_shader(scene_shader)
-        self.render.set_antialias(AntialiasAttrib.MMultisample)
-        scene_shader = ShaderAttrib.make(scene_shader)
-        scene_shader = scene_shader.setFlag(ShaderAttrib.F_hardware_skinning, True)
-
         # initialize player character physics the Bullet way
         shape_1 = BulletCapsuleShape(0.75, 0.5, ZUp)
         player_node = BulletCharacterControllerNode(shape_1, 0.1, 'Player')  # (shape, mass, player name)
@@ -235,8 +199,8 @@ class app(ShowBase):
         fp_character = actor_data.player_character
         fp_character.reparent_to(self.render)
         fp_character.set_scale(1)
-        # set the actor skinning hardware shader
-        fp_character.set_attrib(scene_shader)
+        # set the complexpbr actor skinning
+        complexpbr.skin(fp_character)
 
         self.camera.reparent_to(self.player)
         # reparent character to FPS cam
@@ -250,15 +214,21 @@ class app(ShowBase):
         self.player_gun = actor_data.arm_handgun
         self.player_gun.reparent_to(self.render)
         self.player_gun.reparent_to(self.camera)
+        # set the complexpbr actor skinning
+        complexpbr.skin(self.player_gun)
+        self.player_gun.set_light_off(base.render.find('**/slight_1'))
         self.player_gun.set_x(self.camera, 0.1)
         self.player_gun.set_y(self.camera, 0.4)
         self.player_gun.set_z(self.camera, -0.1)
         
         # directly make a text node to display text
         text_1 = TextNode('text_1_node')
-        text_1.set_text("")
+        text_1.set_text("Quality Mode: Off  (Press 'm' to turn on.)")
+        if int(str(devices)[0]) > 0:
+            text_1.set_text("Quality Mode: Off  (Press 'Y' to turn on.)")
+        # text_1.set_text("Quality Mode: Off  (Press 'm' to turn on.)")
         text_1_node = self.aspect2d.attach_new_node(text_1)
-        text_1_node.set_scale(0.05)
+        text_1_node.set_scale(0.04)
         text_1_node.set_pos(-1.4, 0, 0.92)
         # import font and set pixels per unit font quality
         nunito_font = loader.load_font('fonts/Nunito/Nunito-Light.ttf')
@@ -266,8 +236,7 @@ class app(ShowBase):
         nunito_font.set_page_size(512, 512)
         # apply font
         text_1.set_font(nunito_font)
-        # small caps
-        # text_1.set_small_caps(True)
+        text_1.set_shadow(0.1)
 
         # on-screen target dot for aiming
         target_dot = TextNode('target_dot_node')
@@ -283,9 +252,11 @@ class app(ShowBase):
         
         # directly make a text node to display text
         text_2 = TextNode('text_2_node')
-        text_2.set_text("Neutralize the NPC by shooting the head." + '\n' + "Press 'f' to toggle the flashlight." + '\n' + "Right-click to jump.")
+        text_2.set_text("Neutralize the NPC by shooting the head." + '\n' +
+                        "Press 'f' to toggle the flashlight." + '\n' + "Right-click to jump.")
         if int(str(devices)[0]) > 0:
-            text_2.set_text("Neutralize the NPC by shooting the head." + '\n' + "Press 'X' to toggle the flashlight." + '\n' + "Press 'A' to jump.")
+            text_2.set_text("Neutralize the NPC by shooting the head." + '\n' +
+                            "Press 'X' to toggle the flashlight." + '\n' + "Press 'A' to jump.")
         text_2_node = self.aspect2d.attach_new_node(text_2)
         text_2_node.set_scale(0.04)
         text_2_node.set_pos(-1.4, 0, 0.8)
@@ -295,7 +266,8 @@ class app(ShowBase):
         nunito_font.set_page_size(512, 512)
         # apply font
         text_2.set_font(nunito_font)
-        text_2.set_text_color(0, 0.3, 1, 1)
+        text_2.set_text_color(0.9, 0.9, 0.9, 1)
+        text_2.set_shadow(0.1)
         
         # print player position on mouse click
         def print_player_pos():
@@ -304,69 +276,40 @@ class app(ShowBase):
 
         self.accept('mouse3', print_player_pos)
         self.accept("gamepad-face_a", print_player_pos)
-
-        self.flashlight_state = 0
-
-        def toggle_flashlight():
-            current_flashlight = self.render.find_all_matches("**/flashlight")
-
-            if self.flashlight_state == 0:
-                if len(current_flashlight) == 0:
-                    self.slight = 0
-                    self.slight = Spotlight('flashlight')
-                    self.slight.setShadowCaster(True, 1024, 1024)
-                    self.slight.set_color(VBase4(0.5, 0.6, 0.6, 1))  # slightly bluish
-                    lens = PerspectiveLens()
-                    lens.set_near_far(0.5, 5000)
-                    self.slight.set_lens(lens)
-                    self.slight.set_attenuation((0.5, 0, 0.0000005))
-                    self.slight = self.render.attach_new_node(self.slight)
-                    self.slight.set_pos(-0.1, 0.3, -0.4)
-                    self.slight.reparent_to(self.camera)
-                    self.flashlight_state = 1
-                    self.render.set_light(self.slight)
-
-                elif len(current_flashlight) > 0:
-                    self.render.set_light(self.slight)
-                    self.flashlight_state = 1
-
-            elif self.flashlight_state > 0:
-                self.render.set_light_off(self.slight)
-                self.flashlight_state = 0
-
-        self.accept('f', toggle_flashlight)
-        self.accept("gamepad-face_x", toggle_flashlight)
         
-        # add a few random physics boxes
-        for x in range(0, 40):
+        # add a few random physics spheres
+        for x in range(0, 30):
             # dynamic collision
             random_vec = Vec3(1, 1, 1)
-            special_shape = BulletBoxShape(random_vec)
+            # special_shape = BulletBoxShape(random_vec)
+            special_shape = BulletSphereShape(random_vec[0])
             # rigidbody
             body = BulletRigidBodyNode('random_prisms')
             d_coll = self.render.attach_new_node(body)
             d_coll.node().add_shape(special_shape)
-            d_coll.node().set_mass(0.9)
-            d_coll.node().set_friction(0.5)
+            d_coll.node().set_mass(15)
+            d_coll.node().set_friction(50)
             d_coll.set_collide_mask(BitMask32.allOn())
             # turn on Continuous Collision Detection
             d_coll.node().set_ccd_motion_threshold(0.000000007)
             d_coll.node().set_ccd_swept_sphere_radius(0.30)
-            d_coll.node().set_deactivation_enabled(False)
-            d_coll.set_pos(random.uniform(-60, -20), random.uniform(-60, -20), random.uniform(5, 10))
-            box_model = self.loader.load_model('models/1m_cube.gltf')
+            d_coll.node().set_deactivation_enabled(False)  # prevents stopping the physics simulation
+            d_coll.set_pos(random.uniform(-60, -20), random.uniform(-60, -20), random.uniform(50, 800))
+            sphere_choices = ['1m_sphere_black_marble','1m_sphere_purple_metal','1m_sphere_concrete_1','1m_sphere_bright_1']
+            sphere_choice = random.choice(sphere_choices)
+            box_model = self.loader.load_model('models/' + sphere_choice + '.gltf')
             box_model.reparent_to(self.render)
             box_model.reparent_to(d_coll)
-            box_model.set_color(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
-            self.world.attach_rigid_body(d_coll.node())
+            # box_model.set_pos(0,0,-1)
+
+            if sphere_choice == '1m_sphere_concrete_1':
+                dis_tex = Texture()
+                dis_tex.read('textures\get_file_Concrete017_2K-PNG/Concrete017_2K_Displacement.png')
+                box_model.set_shader_input('displacement_map', dis_tex)
+                box_model.set_shader_input('displacement_scale', 0.03)
             
-        # add a ramp to test out character controller
-        ramp_1 = self.loader.load_model('models/ramp_1.gltf')
-        ramp_1.reparent_to(self.render)
-        ramp_1.set_pos(-20, -5.5, 0)
-        r_pos = ramp_1.get_pos()
-        make_collision_from_model(ramp_1, 0, 0, self.world, (r_pos[0], r_pos[1], r_pos[2] + 1))
-        
+            self.world.attach_rigid_body(d_coll.node())
+
         # NPC_1 load-in
         comp_shape_1 = BulletCapsuleShape(0.05, 0.01, ZUp)
         npc_1_node = BulletCharacterControllerNode(comp_shape_1, 0.2, 'NPC_A_node')  # (shape, mass, character name)
@@ -377,8 +320,8 @@ class app(ShowBase):
         np.set_h(random.randint(0, 180))
         npc_model_1 = actor_data.NPC_1
         npc_model_1.reparent_to(np)
-        # set the actor skinning hardware shader
-        npc_model_1.set_attrib(scene_shader)
+        # set the complexpbr actor skinning
+        complexpbr.skin(npc_model_1)
         # get the separate head model
         npc_1_head = self.loader.load_model('models/npc_1_head.gltf')
         npc_1_head.reparent_to(actor_data.NPC_1.get_parent())
@@ -434,7 +377,7 @@ class app(ShowBase):
                 for x in range(0, 2):
                     m_incs.append(random.uniform(2, 5))
                 
-                print('NPC_1 movement increments this cycle: ' + str(m_incs))
+                # print('NPC_1 movement increments this cycle: ' + str(m_incs))
                 self.npc_1_move_increment[0] = m_incs[0]
                 self.npc_1_move_increment[1] = m_incs[1]
                 time.sleep(3)
@@ -449,10 +392,7 @@ class app(ShowBase):
         
         # activate the movement timer in a dedicated thread to prevent lockup with .sleep()
         threading2._start_new_thread(npc_1_move_gen, ())
-        
-        self.use_seq_cleanup = True
-        self.use_async_cleanup = False
-        
+
         def is_npc_1_shot_seq():
             def gun_anim():
                 gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
@@ -501,56 +441,9 @@ class app(ShowBase):
                     
                 else:
                     seq.start()
-                    
-        def is_npc_1_shot_async():
-            async def gun_anim():
-                gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
-                if not gun_ctrl.is_playing():
-                    actor_data.arm_handgun.stop()
-                    actor_data.arm_handgun.play("shoot")
-                    actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
-            
-            base.taskMgr.add(gun_anim())
-            
-            # target dot ray test
-            # get mouse data
-            mouse_watch = base.mouseWatcherNode
-            if mouse_watch.has_mouse():
-                posMouse = base.mouseWatcherNode.get_mouse()
-                posFrom = Point3()
-                posTo = Point3()
-                base.camLens.extrude(posMouse, posFrom, posTo)
-                posFrom = self.render.get_relative_point(base.cam, posFrom)
-                posTo = self.render.get_relative_point(base.cam, posTo)
-                rayTest = self.world.ray_test_closest(posFrom, posTo)
-                target = rayTest.get_node()
-                target_dot = self.aspect2d.find_all_matches("**/target_dot_node")
+        
+        self.accept('mouse1', is_npc_1_shot_seq)
 
-                if 'special_node_A' in str(target):
-                    async def npc_cleanup():
-                        # the head is hit, the npc is dead
-                        self.npc_1_is_dead = True
-                        text_2.set_text('Congrats, you have won!')
-                        npc_1_control = actor_data.NPC_1.get_anim_control('walking')
-                        if npc_1_control.is_playing():
-                            actor_data.NPC_1.stop()
-                        npc_1_control = actor_data.NPC_1.get_anim_control('death')
-                        if not npc_1_control.is_playing():
-                            actor_data.NPC_1.play('death')
-                        
-                        # Bullet node removals
-                        self.world.remove(target)
-                        rigid_target = self.render.find('**/d_coll_A')
-                        self.world.remove(rigid_target.node())
-                        
-                    base.taskMgr.add(npc_cleanup())
-        
-        if self.use_seq_cleanup:
-            self.accept('mouse1', is_npc_1_shot_seq)
-            
-        elif self.use_async_cleanup:
-            self.accept('mouse1', is_npc_1_shot_async)
-        
         self.gamepad_npc_cleanup_bool = False
         
         def gamepad_trigger_shoot_seq():
@@ -603,95 +496,6 @@ class app(ShowBase):
             
             if not self.gamepad_npc_cleanup_bool:
                 gamepad_npc_test_cleanup()
-                
-        def gamepad_trigger_shoot_async():
-            async def gun_anim():
-                gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
-                if not gun_ctrl.is_playing():
-                    actor_data.arm_handgun.stop()
-                    actor_data.arm_handgun.play("shoot")
-                    actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
-            
-            base.taskMgr.add(gun_anim())
-                
-            # target dot ray test
-            # get mouse data
-            def gamepad_npc_test_cleanup():
-                posMouse = LPoint2f(0, 0)
-                posFrom = Point3()
-                posTo = Point3()
-                base.camLens.extrude(posMouse, posFrom, posTo)
-                posFrom = self.render.get_relative_point(base.cam, posFrom)
-                posTo = self.render.get_relative_point(base.cam, posTo)
-                rayTest = self.world.ray_test_closest(posFrom, posTo)
-                target = rayTest.get_node()
-                target_dot = self.aspect2d.find_all_matches("**/target_dot_node")
-
-                if 'special_node_A' in str(target):
-                    async def npc_cleanup():
-                        # the head is hit, the npc is dead
-                        self.npc_1_is_dead = True
-                        text_2.set_text('Congrats, you have won!')
-                        npc_1_control = actor_data.NPC_1.get_anim_control('walking')
-                        if npc_1_control.is_playing():
-                            actor_data.NPC_1.stop()
-                        npc_1_control = actor_data.NPC_1.get_anim_control('death')
-                        if not npc_1_control.is_playing():
-                            actor_data.NPC_1.play('death')
-                        
-                        # Bullet node removals
-                        self.world.remove(target)
-                        rigid_target = self.render.find('**/d_coll_A')
-                        self.world.remove(rigid_target.node())
-                        
-                    base.taskMgr.add(npc_cleanup())
-            
-            if not self.gamepad_npc_cleanup_bool:
-                gamepad_npc_test_cleanup()
-            
-        def smooth_load_physics():
-            # this is a patch to speed up the cold start hitch on success condition
-            # Bullet node removals
-            self.world.remove(special_node.node())
-            rigid_target = self.render.find('**/d_coll_A')
-            self.world.remove(rigid_target.node())
-            print('NPC physics init cleanup done.')
-             
-        smooth_load_physics()
-        
-        # repeat the NPC physics initialization after smooth_load_physics
-        # create special hit areas
-        # use Task section for npc collision movement logic
-        # special head node size
-        special_shape = BulletBoxShape(Vec3(0.1, 0.1, 0.1))
-        # ghost npc node
-        body = BulletGhostNode('special_node_A')
-        special_node = self.render.attach_new_node(body)
-        special_node.node().add_shape(special_shape, TransformState.makePos(Point3(0, 0, 0.4)))
-        # special_node.node().set_mass(0)
-        # special_node.node().set_friction(0.5)
-        special_node.set_collide_mask(BitMask32(0x0f))
-        # turn on Continuous Collision Detection
-        special_node.node().set_deactivation_enabled(False)
-        special_node.node().set_ccd_motion_threshold(0.000000007)
-        special_node.node().set_ccd_swept_sphere_radius(0.30)
-        self.world.attach_ghost(special_node.node())
-        
-        # dynamic collision
-        special_shape = BulletBoxShape(Vec3(0.3, 0.15, 0.6))
-        # rigidbody npc node
-        body = BulletRigidBodyNode('d_coll_A')
-        d_coll = self.render.attach_new_node(body)
-        d_coll.node().add_shape(special_shape, TransformState.makePos(Point3(0, 0, 0.7)))
-
-        # d_coll.node().set_mass(0)
-        d_coll.node().set_friction(0.5)
-        d_coll.set_collide_mask(BitMask32.allOn())
-        # turn on Continuous Collision Detection
-        d_coll.node().set_deactivation_enabled(False)
-        d_coll.node().set_ccd_motion_threshold(0.000000007)
-        d_coll.node().set_ccd_swept_sphere_radius(0.30)
-        self.world.attach_rigid_body(d_coll.node())
 
         # 3D player movement system begins
         self.keyMap = {"left": 0, "right": 0, "forward": 0, "backward": 0, "run": 0, "jump": 0}
@@ -853,8 +657,6 @@ class app(ShowBase):
                     if p > -30:
                         self.player_gun.show()
 
-
-
                 if self.keyMap["left"]:
                     if self.static_pos_bool:
                         self.static_pos_bool = False
@@ -955,14 +757,10 @@ class app(ShowBase):
             self.left_trigger_val = left_trigger.value
             
             if self.right_trigger_val > 0.2:
-                if self.use_seq_cleanup:
-                    gamepad_trigger_shoot_seq()
-                    
-                elif self.use_async_cleanup:
-                    gamepad_trigger_shoot_async()
+                gamepad_trigger_shoot_seq()
             
-            xy_speed = 12
-            p_speed = 30
+            xy_speed = 7
+            p_speed = 60
             rotate_speed = 100
                 
             r_stick_right_axis = self.gamepad.find_axis(InputDevice.Axis.left_y)

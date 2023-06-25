@@ -7,11 +7,10 @@ Features:
 - Interactive target dot reticule system
 - Gamepad support
 - Armature with "walking" and "death" animations
-- Bloom, HDR, Exposure, Gamma, Volumetric Lighting, Blur/Sharpen, and Ambient Occlusion support
-- Working blend2bam Actor exporting script
-- Physically based shaders via panda3d-simplepbr
-- Hardware Skinning support via customized Actor shaders
-- Bullet Physics integration of environment, characters, and collision cubes
+- PBR IBL rendering via panda3d-complexpbr https://github.com/rayanalysis/panda3d-complexpbr
+- Working gltf2bam Actor exporting script
+- Hardware Skinning support via complexpbr.skin(your_actor)
+- Bullet Physics integration of environment, characters, and collision spheres
 - Advanced timing logic in Panda3D
 - Basic weapon loading and animation
 - State machine based onscreen text updating
@@ -24,12 +23,12 @@ Included Full Assets:
 - Handgun model with Blender file
 - Adult male model with Blender file and .bam animation exports
 - Arena model with Blender file
-- Cube model for randomly colored physics cubes
+- Sphere models for PBR IBL physics spheres
 
 Game Goal:
 - Neutralize the NPC by shooting the head hitbox
 - Receive success message
 
 Requirements: 
-- Panda3D
-- panda3d-gltf
+- panda3d
+- panda3d-complexpbr

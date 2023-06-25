@@ -1,7 +1,7 @@
 # Panda3D-Arena-FPS-Sample-Program
 This is a modern Panda3D sample program with an Arena first person shooter environment and many basic features. This program would be useful to experienced Python programmers jumping into Panda3D with the intention of building a first person shooter.
 
-Features:
+## Features:
 - First person shooter basic environment
 - First person camera handling system
 - Interactive target dot reticule system
@@ -19,16 +19,16 @@ Features:
 - Very basic NPC movement system
 - Jumping and slope physics support 
 
-Included Full Assets:
+## Included Full Assets:
 - Handgun model with Blender file
 - Adult male model with Blender file and .bam animation exports
 - Arena model with Blender file
 - Sphere models for PBR IBL physics spheres
 
-Game Goal:
+## Game Goal:
 - Neutralize the NPC by shooting the head hitbox
 - Receive success message
 
-Requirements: 
+## Requirements: 
 - panda3d
 - panda3d-complexpbr

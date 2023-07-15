@@ -309,7 +309,7 @@ class app(ShowBase):
 
             if sphere_choice == '1m_sphere_concrete_1':
                 dis_tex = Texture()
-                dis_tex.read('textures\get_file_Concrete017_2K-PNG/Concrete017_2K_Displacement.png')
+                dis_tex.read('textures/get_file_Concrete017_2K-PNG/Concrete017_2K_Displacement.png')
                 box_model.set_shader_input('displacement_map', dis_tex)
                 box_model.set_shader_input('displacement_scale', 0.03)
             

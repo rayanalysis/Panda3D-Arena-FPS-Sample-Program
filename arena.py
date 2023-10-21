@@ -54,7 +54,7 @@ import arena_lighting
 class app(ShowBase):
     def __init__(self):
         load_prc_file_data("", """
-            win-size 1920 1080
+            win-size 1280 720
             window-title complexpbr Demo
             framebuffer-multisample 1
             multisamples 4
@@ -80,7 +80,7 @@ class app(ShowBase):
             base.screen_quad.set_shader_input("bloom_intensity", 0.3)
             base.screen_quad.set_shader_input("bloom_threshold", 0.7)
             base.screen_quad.set_shader_input("bloom_blur_width", 10)
-            base.screen_quad.set_shader_input("bloom_samples", 6)
+            base.screen_quad.set_shader_input("bloom_samples", 3)
             base.screen_quad.set_shader_input('ssr_samples', 0)
             base.screen_quad.set_shader_input('ssao_samples', 6)
             base.screen_quad.set_shader_input('hsv_r', 1.0)
@@ -158,7 +158,7 @@ class app(ShowBase):
         self.world = BulletWorld()
         self.world.set_gravity(Vec3(0, 0, -9.81))
         
-        arena_1 = self.loader.load_model('models/arena_1.gltf')
+        arena_1 = self.loader.load_model('models/arena_1.bam')
         arena_1.reparent_to(self.render)
         arena_1.set_pos(0, 0, 0)
         
@@ -189,7 +189,7 @@ class app(ShowBase):
             world.attach_rigid_body(np.node())
         
         make_collision_from_model(arena_1, 0, 0, self.world, (arena_1.get_pos()))
-
+	
         # initialize player character physics the Bullet way
         shape_1 = BulletCapsuleShape(0.75, 0.5, ZUp)
         player_node = BulletCharacterControllerNode(shape_1, 0.1, 'Player')  # (shape, mass, player name)
@@ -281,7 +281,7 @@ class app(ShowBase):
 
         self.accept('mouse3', print_player_pos)
         self.accept("gamepad-face_a", print_player_pos)
-        
+
         # add a few random physics spheres
         for x in range(0, 30):
             # dynamic collision
@@ -302,7 +302,7 @@ class app(ShowBase):
             d_coll.set_pos(random.uniform(-60, -20), random.uniform(-60, -20), random.uniform(50, 800))
             sphere_choices = ['1m_sphere_black_marble','1m_sphere_purple_metal','1m_sphere_concrete_1','1m_sphere_bright_1']
             sphere_choice = random.choice(sphere_choices)
-            box_model = self.loader.load_model('models/' + sphere_choice + '.gltf')
+            box_model = self.loader.load_model('models/' + sphere_choice + '.bam')
             box_model.reparent_to(self.render)
             box_model.reparent_to(d_coll)
             # box_model.set_pos(0,0,-1)
@@ -328,7 +328,7 @@ class app(ShowBase):
         # set the complexpbr actor skinning
         complexpbr.skin(npc_model_1)
         # get the separate head model
-        npc_1_head = self.loader.load_model('models/npc_1_head.gltf')
+        npc_1_head = self.loader.load_model('models/npc_1_head.bam')
         npc_1_head.reparent_to(actor_data.NPC_1.get_parent())
         
         # npc base animation loop

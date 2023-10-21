@@ -11,7 +11,7 @@ def lighting():
 
     slight_1 = Spotlight('slight_1')
     slight_1.set_color(Vec4(Vec3(5),1))
-    slight_1.set_shadow_caster(True, 16384, 16384)
+    slight_1.set_shadow_caster(True, 4096, 4096)
     # slight_1.set_attenuation((0.5,0,0.000005))
     lens = PerspectiveLens()
     slight_1.set_lens(lens)
@@ -38,7 +38,7 @@ def lighting():
     env_light_1 = base.render.attach_new_node(env_light_1)
     env_light_1.set_pos(0,0,0)
 
-    base_env = loader.load_model('models/daytime_skybox.gltf')
+    base_env = loader.load_model('models/daytime_skybox.bam')
     base_env.reparent_to(base.render)
     base_env.set_scale(1)
     base_env.set_pos(0,0,0)
@@ -47,7 +47,7 @@ def lighting():
 
 def init_flashlight():
     base.slight = Spotlight('flashlight')
-    base.slight.setShadowCaster(True, 1024, 1024)
+    base.slight.setShadowCaster(True, 512, 512)
     base.slight.set_color(VBase4(5.5, 5.6, 5.6, 1))  # slightly bluish
     lens = PerspectiveLens()
     lens.set_near_far(0.5, 500)

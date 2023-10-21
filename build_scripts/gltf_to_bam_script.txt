@@ -1,0 +1,1 @@
+gltf2bam 1m_sphere_black_marble.gltf 1m_sphere_black_marble.bam

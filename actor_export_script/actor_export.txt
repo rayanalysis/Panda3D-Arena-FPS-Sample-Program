@@ -1,1 +1,0 @@
-gltf2bam arm_handgun.gltf arm_handgun.bam --animations separate

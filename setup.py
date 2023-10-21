@@ -24,7 +24,7 @@ setup(
                 "build/*",
                 "dist/*",
                 ".git/*",
-                "*__pychache__*",
+                "*__pycache__*",
                 "README.md",
                 "requirements.txt",
                 "setup.py"

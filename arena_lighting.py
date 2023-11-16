@@ -47,7 +47,7 @@ def lighting():
 
 def init_flashlight():
     base.slight = Spotlight('flashlight')
-    base.slight.setShadowCaster(True, 512, 512)
+    # base.slight.setShadowCaster(True, 512, 512)
     base.slight.set_color(VBase4(5.5, 5.6, 5.6, 1))  # slightly bluish
     lens = PerspectiveLens()
     lens.set_near_far(0.5, 500)

@@ -605,9 +605,8 @@ class app(ShowBase):
                                 dot.node().set_text_color(1, 1, 1, 1)
                                 
                 # get mouse data
-                mouse_watch = base.mouseWatcherNode
-                if mouse_watch.has_mouse():
-                    pointer = base.win.get_pointer(0)
+                pointer = base.win.get_pointer(0)
+                if pointer.in_window:
                     mouseX = pointer.get_x()
                     mouseY = pointer.get_y()
                     

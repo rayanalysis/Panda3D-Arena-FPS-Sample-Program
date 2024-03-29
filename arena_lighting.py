@@ -6,7 +6,7 @@ def lighting():
     # lighting entry point
     amb_light = AmbientLight('amblight')
     amb_light.set_color(Vec4(Vec3(1),1))
-    amb_light_node = base.render.attachNewNode(amb_light)
+    amb_light_node = base.render.attach_new_node(amb_light)
     base.render.set_light(amb_light_node)
 
     slight_1 = Spotlight('slight_1')

@@ -72,12 +72,12 @@ class app(ShowBase):
         self.accept("gamepad-face_x", arena_lighting.toggle_flashlight)
 
         # complexpbr
-        complexpbr.apply_shader(self.render)
+        complexpbr.apply_shader(self.render, intensity=1.0)
 
         def quality_mode():
             complexpbr.screenspace_init()
         
-            base.screen_quad.set_shader_input("bloom_intensity", 0.3)
+            base.screen_quad.set_shader_input("bloom_intensity", 0.5)
             base.screen_quad.set_shader_input("bloom_threshold", 0.7)
             base.screen_quad.set_shader_input("bloom_blur_width", 10)
             base.screen_quad.set_shader_input("bloom_samples", 3)
@@ -847,6 +847,16 @@ class app(ShowBase):
         debugNP = self.render.attach_new_node(debugNode)
         self.world.set_debug_node(debugNP.node())
 
+        # pre-initialize death animation to smooth out win-state animation
+        # playing for the first time
+        npc_1_control = actor_data.NPC_1.get_anim_control('death')
+        if not npc_1_control.is_playing():
+            actor_data.NPC_1.play('death')
+
+        npc_1_control = actor_data.NPC_1.get_anim_control('walking')
+        if not npc_1_control.is_playing():
+            actor_data.NPC_1.play('walking')
+
         # debug toggle function
         def toggle_debug():
             if debugNP.is_hidden():
@@ -859,11 +869,13 @@ class app(ShowBase):
         def update(Task):
             if self.game_start < 1:
                 self.game_start = 1
+
             return Task.cont
 
         def physics_update(Task):
             dt = globalClock.get_dt()
             self.world.do_physics(dt)
+
             return Task.cont
             
         if self.gamepad is None:

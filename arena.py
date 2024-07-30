@@ -77,9 +77,9 @@ class app(ShowBase):
         def quality_mode():
             complexpbr.screenspace_init()
         
-            base.screen_quad.set_shader_input("bloom_intensity", 0.5)
-            base.screen_quad.set_shader_input("bloom_threshold", 0.7)
-            base.screen_quad.set_shader_input("bloom_blur_width", 10)
+            base.screen_quad.set_shader_input("bloom_intensity", 0.25)
+            base.screen_quad.set_shader_input("bloom_threshold", 0.3)
+            base.screen_quad.set_shader_input("bloom_blur_width", 20)
             base.screen_quad.set_shader_input("bloom_samples", 3)
             base.screen_quad.set_shader_input('ssr_samples', 0)
             base.screen_quad.set_shader_input('ssao_samples', 6)
@@ -855,7 +855,7 @@ class app(ShowBase):
 
         npc_1_control = actor_data.NPC_1.get_anim_control('walking')
         if not npc_1_control.is_playing():
-            actor_data.NPC_1.play('walking')
+            actor_data.NPC_1.loop('walking')
 
         # debug toggle function
         def toggle_debug():

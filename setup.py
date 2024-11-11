@@ -30,7 +30,7 @@ setup(
                 "setup.py"
             ],
             "gui_apps" : {
-                "FPS Program" : "arena.py"
+                "FPS Program" : "main.py"
             },
             "icons" : {
                 "FPS Program" : [

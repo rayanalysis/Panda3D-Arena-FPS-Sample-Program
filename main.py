@@ -72,7 +72,7 @@ class app(ShowBase):
         self.accept("gamepad-face_x", arena_lighting.toggle_flashlight)
 
         # complexpbr
-        complexpbr.apply_shader(self.render, intensity=1.0)
+        complexpbr.apply_shader(self.render, custom_dir='shaders/')
 
         def quality_mode():
             complexpbr.screenspace_init()
@@ -225,6 +225,7 @@ class app(ShowBase):
         self.player_gun.set_x(self.camera, 0.1)
         self.player_gun.set_y(self.camera, 0.4)
         self.player_gun.set_z(self.camera, -0.1)
+        self.player_gun.set_shader_input('shadow_boost', 0.1)
         
         # directly make a text node to display text
         text_1 = TextNode('text_1_node')
@@ -312,7 +313,10 @@ class app(ShowBase):
                 dis_tex.read('textures/get_file_Concrete017_2K-PNG/Concrete017_2K_Displacement.png')
                 box_model.set_shader_input('displacement_map', dis_tex)
                 box_model.set_shader_input('displacement_scale', 0.03)
-            
+
+            if sphere_choice in ['1m_sphere_black_marble','1m_sphere_concrete_1','1m_sphere_bright_1']:
+                box_model.set_shader_input('shadow_boost', 0.5)
+                
             self.world.attach_rigid_body(d_coll.node())
 
         # NPC_1 load-in

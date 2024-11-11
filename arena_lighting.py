@@ -10,7 +10,7 @@ def lighting():
     base.render.set_light(amb_light_node)
 
     slight_1 = Spotlight('slight_1')
-    slight_1.set_color(Vec4(Vec3(5),1))
+    slight_1.set_color(Vec4(Vec3(8),1))
     slight_1.set_shadow_caster(True, 4096, 4096)
     # slight_1.set_attenuation((0.5,0,0.000005))
     lens = PerspectiveLens()
@@ -20,18 +20,6 @@ def lighting():
     slight_1_node.set_pos(50, 50, 90)
     slight_1_node.look_at(0,0,0.5)
     base.render.set_light(slight_1_node)
-
-    slight_2 = Spotlight('slight_2')
-    slight_2.set_color(Vec4(Vec3(5),1))
-    # slight_2.set_shadow_caster(True, 16384, 16384)
-    slight_2.set_attenuation((0.5,0,0.0005))
-    lens = PerspectiveLens()
-    slight_2.set_lens(lens)
-    slight_2.get_lens().set_fov(90)
-    slight_2_node = base.render.attach_new_node(slight_2)
-    slight_2_node.set_pos(-82, -79, 50)
-    slight_2_node.look_at(0,0,0.5)
-    base.render.set_light(slight_2_node)
 
     env_light_1 = PointLight('env_light_1')
     env_light_1.set_color(Vec4(Vec3(6),1))

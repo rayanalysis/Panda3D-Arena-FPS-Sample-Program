@@ -73,6 +73,8 @@ class app(ShowBase):
 
         # complexpbr
         complexpbr.apply_shader(self.render, custom_dir='shaders/')
+        base.complexpbr_map_z = 3.5
+        base.complexpbr_z_tracking = True
 
         def quality_mode():
             complexpbr.screenspace_init()

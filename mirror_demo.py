@@ -73,28 +73,25 @@ class app(ShowBase):
 
         # complexpbr
         complexpbr.apply_shader(self.render, env_res=512, custom_dir='shaders/')
-        base.complexpbr_map_z = 3.5
-        base.complexpbr_z_tracking = True
+        base.complexpbr_map_z = 0
+        base.complexpbr_z_tracking = False
         
+        for x in base.complexpbr_map.find_all_matches('**/+Camera'):
+            x.node().get_lens().set_near_far(0.01, 3000)
+            
         base.complexpbr_map_2 = NodePath('cuberig_2')
-        base.cube_buffer_2 = base.win.make_cube_map('cubemap_2', 512, base.complexpbr_map_2)
         base.complexpbr_map_2.reparent_to(base.render)
-        base.complexpbr_map_z_2 = 0.0
+        base.cube_buffer_2 = base.win.make_cube_map('cubemap_2', 512, base.complexpbr_map_2)
+        base.complexpbr_map_z_2 = 0
         
         def rotate_cubemap_2(task):
             base.complexpbr_map_2.set_h(base.render,base.cam.get_h(base.render))
             base.complexpbr_map_2.set_p(base.render,base.cam.get_p(base.render) + 90)
-            cam_pos = base.cam.get_pos(base.render)
-            base.complexpbr_map_2.set_pos(cam_pos[0],cam_pos[1],cam_pos[2]+base.complexpbr_map_z_2)
-            
-            if base.env_cam_pos is not None:
-                base.complexpbr_map_2.set_pos(base.env_cam_pos[0],base.env_cam_pos[1],base.env_cam_pos[2]+base.complexpbr_map_z_2)
-            else:
-                base.complexpbr_map_2.set_pos(cam_pos[0],cam_pos[1],cam_pos[2]+base.complexpbr_map_z_2)
- 
+            cam_relative_pos = base.cam.get_pos(base.render)
+            cam_relative_pos[2] = cam_relative_pos[2]-(2 * cam_relative_pos[2])
+            base.complexpbr_map_2.set_pos(cam_relative_pos[0],cam_relative_pos[1],cam_relative_pos[2]+base.complexpbr_map_z_2)
+        
             return task.cont
-            
-        self.task_mgr.add(rotate_cubemap_2)
 
         def quality_mode():
             complexpbr.screenspace_init()
@@ -184,6 +181,8 @@ class app(ShowBase):
         arena_1.reparent_to(self.render)
         arena_1.set_pos(0, 0, 0)
         # arena_1.flatten_strong()
+        # we're using the secondary cubemap buffer cube_buffer_2 to render onto the floor
+        # using the existing cubemaptex texture input already supplied by complexpbr
         arena_1.find('**/Plane').set_shader_input("cubemaptex", base.cube_buffer_2.get_texture())
 
         def make_collision_from_model(input_model, node_number, mass, world, target_pos):
@@ -333,6 +332,7 @@ class app(ShowBase):
             box_model = self.loader.load_model('models/' + sphere_choice + '.bam')
             box_model.reparent_to(self.render)
             box_model.reparent_to(d_coll)
+            # box_model.set_shader_input("cubemaptex", base.cube_buffer_2.get_texture())
             # box_model.set_pos(0,0,-1)
 
             if sphere_choice == '1m_sphere_concrete_1':
@@ -490,7 +490,7 @@ class app(ShowBase):
                 gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
                 if not gun_ctrl.is_playing():
                     actor_data.arm_handgun.stop()
-                    actor_data.arm_handgun.play("shoot")
+                    actor_data.arm_handgun.plafy("shoot")
                     actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
             
             seq = Sequence()
@@ -921,5 +921,6 @@ class app(ShowBase):
         self.task_mgr.add(update)
         self.task_mgr.add(move_npc)
         self.task_mgr.add(physics_update)
+        self.task_mgr.add(rotate_cubemap_2)
 
 app().run()

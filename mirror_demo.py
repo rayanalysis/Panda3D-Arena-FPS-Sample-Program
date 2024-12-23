@@ -490,7 +490,7 @@ class app(ShowBase):
                 gun_ctrl = actor_data.arm_handgun.get_anim_control('shoot')
                 if not gun_ctrl.is_playing():
                     actor_data.arm_handgun.stop()
-                    actor_data.arm_handgun.plafy("shoot")
+                    actor_data.arm_handgun.play("shoot")
                     actor_data.arm_handgun.set_play_rate(12.0, 'shoot')
             
             seq = Sequence()

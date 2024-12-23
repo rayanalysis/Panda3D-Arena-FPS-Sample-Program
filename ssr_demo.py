@@ -72,7 +72,7 @@ class app(ShowBase):
         self.accept("gamepad-face_x", arena_lighting.toggle_flashlight)
 
         # complexpbr
-        complexpbr.apply_shader(self.render, custom_dir='shaders/,', intensity=0.1)
+        complexpbr.apply_shader(self.render, custom_dir='shaders/,', intensity=0.0)
         base.complexpbr_map_z = 3.5
         base.complexpbr_z_tracking = True
 
@@ -82,11 +82,14 @@ class app(ShowBase):
             base.screen_quad.set_shader_input("bloom_intensity", 0.25)
             base.screen_quad.set_shader_input("bloom_threshold", 0.3)
             base.screen_quad.set_shader_input("bloom_blur_width", 20)
-            base.screen_quad.set_shader_input("bloom_samples", 3)
+            base.screen_quad.set_shader_input("bloom_samples", 2)
             base.screen_quad.set_shader_input('ssr_intensity', 2.0)
-            base.screen_quad.set_shader_input('ssr_step', 0.75)
-            base.screen_quad.set_shader_input('reflection_threshold', 1.6)
-            base.screen_quad.set_shader_input('ssr_samples', 32)
+            base.screen_quad.set_shader_input('reflection_threshold', 1.6)  # subtracts from intensity
+            base.screen_quad.set_shader_input('ssr_step', 5.75)  # helps determine reflect height
+            base.screen_quad.set_shader_input('screen_ray_factor', 0.06)  # detail factor
+            base.screen_quad.set_shader_input('ssr_samples', 256)  # determines total steps
+            base.screen_quad.set_shader_input('ssr_depth_cutoff', 0.52)
+            base.screen_quad.set_shader_input('ssr_depth_min', 0.49)
             base.screen_quad.set_shader_input('ssao_samples', 2)
             base.screen_quad.set_shader_input('hsv_r', 1.0)
             base.screen_quad.set_shader_input('hsv_g', 1.1)
@@ -163,7 +166,7 @@ class app(ShowBase):
         self.world = BulletWorld()
         self.world.set_gravity(Vec3(0, 0, -9.81))
         
-        arena_1 = self.loader.load_model('models/arena_1.bam')
+        arena_1 = self.loader.load_model('models/arena_1_blank.glb')
         arena_1.reparent_to(self.render)
         arena_1.set_pos(0, 0, 0)
         
@@ -199,7 +202,7 @@ class app(ShowBase):
         shape_1 = BulletCapsuleShape(0.75, 0.5, ZUp)
         player_node = BulletCharacterControllerNode(shape_1, 0.1, 'Player')  # (shape, mass, player name)
         player_np = self.render.attach_new_node(player_node)
-        player_np.set_pos(-20, -10, 30)
+        player_np.set_pos(-20, -10, 5)
         player_np.set_collide_mask(BitMask32.allOn())
         self.world.attach_character(player_np.node())
         # cast player_np to self.player

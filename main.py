@@ -72,9 +72,9 @@ class app(ShowBase):
         self.accept("gamepad-face_x", arena_lighting.toggle_flashlight)
 
         # complexpbr
-        complexpbr.apply_shader(self.render, custom_dir='shaders/')
-        base.complexpbr_map_z = 3.5
-        base.complexpbr_z_tracking = True
+        complexpbr.apply_shader(self.render, custom_dir='shaders/', shadow_boost=0.2)
+        base.complexpbr_map_z = 0.0
+        base.complexpbr_z_tracking = False
 
         def quality_mode():
             complexpbr.screenspace_init()
@@ -82,9 +82,15 @@ class app(ShowBase):
             base.screen_quad.set_shader_input("bloom_intensity", 0.25)
             base.screen_quad.set_shader_input("bloom_threshold", 0.3)
             base.screen_quad.set_shader_input("bloom_blur_width", 20)
-            base.screen_quad.set_shader_input("bloom_samples", 3)
-            base.screen_quad.set_shader_input('ssr_samples', 0)
-            base.screen_quad.set_shader_input('ssao_samples', 6)
+            base.screen_quad.set_shader_input("bloom_samples", 2)
+            base.screen_quad.set_shader_input('ssr_intensity', 2.0)
+            base.screen_quad.set_shader_input('reflection_threshold', 1.6)  # subtracts from intensity
+            base.screen_quad.set_shader_input('ssr_step', 5.75)  # helps determine reflect height
+            base.screen_quad.set_shader_input('screen_ray_factor', 0.06)  # detail factor
+            base.screen_quad.set_shader_input('ssr_samples', 1)  # determines total steps
+            base.screen_quad.set_shader_input('ssr_depth_cutoff', 0.52)
+            base.screen_quad.set_shader_input('ssr_depth_min', 0.49)
+            base.screen_quad.set_shader_input('ssao_samples', 2)
             base.screen_quad.set_shader_input('hsv_r', 1.0)
             base.screen_quad.set_shader_input('hsv_g', 1.1)
             base.screen_quad.set_shader_input('hsv_b', 1.0)

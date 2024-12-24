@@ -39,6 +39,7 @@ def lighting():
     env_light_1.set_pos(0,0,0)
 
     base_env = loader.load_model('models/daytime_skybox.bam')
+    base_env.name = 'basic_skybox'
     base_env.reparent_to(base.render)
     base_env.set_scale(1)
     base_env.set_pos(0,0,0)
@@ -58,6 +59,7 @@ def init_flashlight():
     # base.render.set_light(base.slight)
     base.slight.reparent_to(base.cam)
     base.slight.set_pos(0,0.4,0.2)
+    base.render.find('**/basic_skybox').set_light_off(base.slight)
 
 def toggle_flashlight():
     if base.render.has_light(base.slight):

@@ -75,6 +75,7 @@ class app(ShowBase):
         complexpbr.apply_shader(self.render, custom_dir='shaders/,', intensity=0.0)
         base.complexpbr_map_z = 3.5
         base.complexpbr_z_tracking = True
+        complexpbr.set_cubebuff_inactive()  # performance boost as we're using SSR
 
         def quality_mode():
             complexpbr.screenspace_init()
@@ -88,8 +89,8 @@ class app(ShowBase):
             base.screen_quad.set_shader_input('ssr_step', 5.75)  # helps determine reflect height
             base.screen_quad.set_shader_input('screen_ray_factor', 0.06)  # detail factor
             base.screen_quad.set_shader_input('ssr_samples', 256)  # determines total steps
-            base.screen_quad.set_shader_input('ssr_depth_cutoff', 0.52)
-            base.screen_quad.set_shader_input('ssr_depth_min', 0.49)
+            base.screen_quad.set_shader_input('ssr_depth_cutoff', 1.0)
+            base.screen_quad.set_shader_input('ssr_depth_min', 0.1)
             base.screen_quad.set_shader_input('ssao_samples', 2)
             base.screen_quad.set_shader_input('hsv_r', 1.0)
             base.screen_quad.set_shader_input('hsv_g', 1.1)

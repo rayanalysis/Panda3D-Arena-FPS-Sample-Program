@@ -75,6 +75,9 @@ class app(ShowBase):
         complexpbr.apply_shader(self.render, custom_dir='shaders/', shadow_boost=0.2)
         base.complexpbr_map_z = 0.0
         base.complexpbr_z_tracking = False
+        
+        for x in base.complexpbr_map.find_all_matches('**/+Camera'):
+            x.node().get_lens().set_near_far(0.01, 3000)
 
         def quality_mode():
             complexpbr.screenspace_init()
@@ -94,6 +97,7 @@ class app(ShowBase):
             base.screen_quad.set_shader_input('hsv_r', 1.0)
             base.screen_quad.set_shader_input('hsv_g', 1.1)
             base.screen_quad.set_shader_input('hsv_b', 1.0)
+            base.screen_quad.set_shader_input('final_brightness', 1.2)
 
             text_1.set_text("Quality Mode: On")
 

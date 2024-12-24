@@ -111,6 +111,7 @@ class app(ShowBase):
             base.screen_quad.set_shader_input('hsv_r', 1.0)
             base.screen_quad.set_shader_input('hsv_g', 1.1)
             base.screen_quad.set_shader_input('hsv_b', 1.0)
+            base.screen_quad.set_shader_input('final_brightness', 1.3)
 
             text_1.set_text("Quality Mode: On")
 

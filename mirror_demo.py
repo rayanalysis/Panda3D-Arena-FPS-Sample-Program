@@ -60,6 +60,7 @@ class app(ShowBase):
             multisamples 4
             hardware-animated-vertices #t
             cursor-hidden #t
+            model-cache-dir
         """)
 
         # initialize the showbase
@@ -183,14 +184,6 @@ class app(ShowBase):
 
         self.world = BulletWorld()
         self.world.set_gravity(Vec3(0, 0, -9.81))
-        
-        arena_1 = self.loader.load_model('models/arena_1_mirror.glb')
-        arena_1.reparent_to(self.render)
-        arena_1.set_pos(0, 0, 0)
-        # arena_1.flatten_strong()
-        # we're using the secondary cubemap buffer cube_buffer_2 to render onto the floor
-        # using the existing cubemaptex texture input already supplied by complexpbr
-        arena_1.find('**/Plane').set_shader_input("cubemaptex", base.cube_buffer_2.get_texture())
 
         def make_collision_from_model(input_model, node_number, mass, world, target_pos):
             # tristrip generation from static models
@@ -217,11 +210,20 @@ class app(ShowBase):
             # np.set_r(180)
             np.set_collide_mask(BitMask32.allOn())
             world.attach_rigid_body(np.node())
-        
-        # make_collision_from_model(arena_1, 0, 0, self.world, (arena_1.get_pos()))
-        arena_walls = arena_1.find('**/walls')
-        # print(arena_walls)
-        make_collision_from_model(arena_walls, 0, 0, self.world, (arena_1.get_pos()))
+
+        arena_1 = self.loader.load_model('models/arena_1_mirror.glb')
+        arena_1.reparent_to(self.render)
+        arena_1.set_pos(0, 0, 0)
+        # arena_1.flatten_strong()
+        try:
+            # we're using the secondary cubemap buffer cube_buffer_2 to render onto the floor
+            # using the existing cubemaptex texture input already supplied by complexpbr
+            arena_1.find('**/Plane').set_shader_input("cubemaptex", base.cube_buffer_2.get_texture())
+            arena_walls = arena_1.find('**/walls')
+            # print(arena_walls)
+            make_collision_from_model(arena_walls, 0, 0, self.world, (arena_1.get_pos()))
+        except:
+            print('Model load error, are you using panda3d-gltf?')
 
         # initialize player character physics the Bullet way
         shape_1 = BulletCapsuleShape(0.75, 0.5, ZUp)

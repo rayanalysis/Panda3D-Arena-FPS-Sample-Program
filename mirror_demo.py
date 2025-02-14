@@ -76,6 +76,7 @@ class app(ShowBase):
         complexpbr.apply_shader(self.render, custom_dir='shaders/', shadow_boost=0.2)
         base.complexpbr_map_z = 0
         base.complexpbr_z_tracking = False
+        base.cube_buffer.set_sort(-1000)  # ensures the primary reflections don't lag a frame behind
         
         for x in base.complexpbr_map.find_all_matches('**/+Camera'):
             x.node().get_lens().set_near_far(0.01, 3000)
@@ -84,6 +85,7 @@ class app(ShowBase):
         base.complexpbr_map_2.reparent_to(base.render)
         base.cube_buffer_2 = base.win.make_cube_map('cubemap_2', 512, base.complexpbr_map_2)
         base.complexpbr_map_z_2 = 0
+        base.cube_buffer_2.set_sort(-1000)  # ensures the secondary reflections don't lag a frame behind
         
         def rotate_cubemap_2(task):
             base.complexpbr_map_2.set_h(base.render,base.cam.get_h(base.render))
@@ -248,7 +250,7 @@ class app(ShowBase):
         fp_character.set_pos(0, 0, -0.95)
         # self.camera.set_x(self.player, 1)
         self.camera.set_y(self.player, 0.03)
-        self.camera.set_z(self.player, 0.5)
+        self.camera.set_z(self.player, 0.55)
         
         # player gun begins
         self.player_gun = actor_data.arm_handgun

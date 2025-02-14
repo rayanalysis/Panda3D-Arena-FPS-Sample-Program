@@ -223,7 +223,7 @@ class app(ShowBase):
         fp_character.set_pos(0, 0, -0.95)
         # self.camera.set_x(self.player, 1)
         self.camera.set_y(self.player, 0.03)
-        self.camera.set_z(self.player, 0.5)
+        self.camera.set_z(self.player, 0.55)
         
         # player gun begins
         self.player_gun = actor_data.arm_handgun

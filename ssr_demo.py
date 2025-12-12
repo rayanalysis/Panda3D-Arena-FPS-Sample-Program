@@ -168,7 +168,9 @@ class app(ShowBase):
         self.world = BulletWorld()
         self.world.set_gravity(Vec3(0, 0, -9.81))
         
-        arena_1 = self.loader.load_model('models/arena_1_blank.glb')
+        # arena_1 = self.loader.load_model('models/arena_1_blank.glb')
+        # arena_1.write_bam_file('models/arena_1_blank.bam')
+        arena_1 = self.loader.load_model('models/arena_1_blank.bam')
         arena_1.reparent_to(self.render)
         arena_1.set_pos(0, 0, 0)
         

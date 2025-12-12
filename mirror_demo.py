@@ -213,7 +213,9 @@ class app(ShowBase):
             np.set_collide_mask(BitMask32.allOn())
             world.attach_rigid_body(np.node())
 
-        arena_1 = self.loader.load_model('models/arena_1_mirror.glb')
+        # arena_1 = self.loader.load_model('models/arena_1_mirror.glb')
+        # arena_1.write_bam_file('models/arena_1_mirror.bam')
+        arena_1 = self.loader.load_model('models/arena_1_mirror.bam')
         arena_1.reparent_to(self.render)
         arena_1.set_pos(0, 0, 0)
         # arena_1.flatten_strong()

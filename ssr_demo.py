@@ -84,13 +84,13 @@ class app(ShowBase):
             base.screen_quad.set_shader_input("bloom_threshold", 0.3)
             base.screen_quad.set_shader_input("bloom_blur_width", 20)
             base.screen_quad.set_shader_input("bloom_samples", 2)
-            base.screen_quad.set_shader_input('ssr_intensity', 2.0)
-            base.screen_quad.set_shader_input('reflection_threshold', 1.6)  # subtracts from intensity
-            base.screen_quad.set_shader_input('ssr_step', 5.75)  # helps determine reflect height
-            base.screen_quad.set_shader_input('screen_ray_factor', 0.12)  # detail factor
-            base.screen_quad.set_shader_input('ssr_samples', 128)  # determines total steps
-            base.screen_quad.set_shader_input('ssr_depth_cutoff', 0.52)
-            base.screen_quad.set_shader_input('ssr_depth_min', 0.49)
+            base.screen_quad.set_shader_input('ssr_intensity', 1.0)
+            base.screen_quad.set_shader_input('reflection_threshold', 0.8)  # subtracts from intensity
+            base.screen_quad.set_shader_input('ssr_step', 0.8)  # helps determine reflect height
+            base.screen_quad.set_shader_input('screen_ray_factor', -1.7)  # detail factor
+            base.screen_quad.set_shader_input('ssr_samples', 24)  # determines total steps
+            base.screen_quad.set_shader_input('ssr_depth_cutoff', 50.0)
+            base.screen_quad.set_shader_input('ssr_depth_min', 0.0)
             base.screen_quad.set_shader_input('ssao_samples', 2)
             base.screen_quad.set_shader_input('hsv_r', 1.0)
             base.screen_quad.set_shader_input('hsv_g', 1.1)
@@ -174,6 +174,8 @@ class app(ShowBase):
         arena_1.reparent_to(self.render)
         arena_1.set_pos(0, 0, 0)
         
+        base.render.find('**/slight_1').node().set_shadow_caster(False)
+        
         def make_collision_from_model(input_model, node_number, mass, world, target_pos):
             # tristrip generation from static models
             # generic tri-strip collision generator begins
@@ -206,7 +208,7 @@ class app(ShowBase):
         shape_1 = BulletCapsuleShape(0.75, 0.5, ZUp)
         player_node = BulletCharacterControllerNode(shape_1, 0.1, 'Player')  # (shape, mass, player name)
         player_np = self.render.attach_new_node(player_node)
-        player_np.set_pos(-20, -10, 5)
+        player_np.set_pos(28.1, -88.7, 5)
         player_np.set_collide_mask(BitMask32.allOn())
         self.world.attach_character(player_np.node())
         # cast player_np to self.player
@@ -226,6 +228,7 @@ class app(ShowBase):
         # self.camera.set_x(self.player, 1)
         self.camera.set_y(self.player, 0.03)
         self.camera.set_z(self.player, 0.55)
+        self.player.look_at(-100, -30, 0)
         
         # player gun begins
         self.player_gun = actor_data.arm_handgun
@@ -233,7 +236,7 @@ class app(ShowBase):
         self.player_gun.reparent_to(self.camera)
         # set the complexpbr actor skinning
         complexpbr.skin(self.player_gun)
-        self.player_gun.set_light_off(base.render.find('**/slight_1'))
+        # self.player_gun.set_light_off(base.render.find('**/slight_1'))
         self.player_gun.set_x(self.camera, 0.1)
         self.player_gun.set_y(self.camera, 0.4)
         self.player_gun.set_z(self.camera, -0.1)
@@ -316,11 +319,12 @@ class app(ShowBase):
             d_coll.node().set_ccd_swept_sphere_radius(0.30)
             d_coll.node().set_deactivation_enabled(False)  # prevents stopping the physics simulation
             d_coll.set_pos(random.uniform(-60, -20), random.uniform(-60, -20), random.uniform(50, 800))
-            sphere_choices = ['1m_sphere_bright_1']
+            sphere_choices = ['1m_sphere_black_marble','1m_sphere_purple_metal','1m_sphere_concrete_1','1m_sphere_bright_1']
             sphere_choice = random.choice(sphere_choices)
             box_model = self.loader.load_model('models/' + sphere_choice + '.bam')
             box_model.reparent_to(self.render)
             box_model.reparent_to(d_coll)
+            # box_model.set_shader_input("cubemaptex", base.cube_buffer_2.get_texture())
             # box_model.set_pos(0,0,-1)
 
             if sphere_choice == '1m_sphere_concrete_1':
@@ -331,6 +335,9 @@ class app(ShowBase):
 
             if sphere_choice in ['1m_sphere_black_marble','1m_sphere_concrete_1','1m_sphere_bright_1']:
                 box_model.set_shader_input('shadow_boost', 0.5)
+                
+            if sphere_choice in ['1m_sphere_purple_metal']:
+                box_model.set_shader_input('shadow_boost', 0.3)
                 
             self.world.attach_rigid_body(d_coll.node())
 

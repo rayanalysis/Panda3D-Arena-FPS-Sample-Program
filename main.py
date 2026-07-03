@@ -72,7 +72,7 @@ class app(ShowBase):
         self.accept("gamepad-face_x", arena_lighting.toggle_flashlight)
 
         # complexpbr
-        complexpbr.apply_shader(self.render, custom_dir='shaders/', shadow_boost=0.2)
+        complexpbr.apply_shader(self.render, shadow_boost=0.2)
         base.complexpbr_map_z = 0.0
         base.complexpbr_z_tracking = False
         base.cube_buffer.set_sort(-1000)  # ensures the reflections don't lag a frame behind
@@ -94,7 +94,9 @@ class app(ShowBase):
             base.screen_quad.set_shader_input('ssr_samples', 1)  # determines total steps
             base.screen_quad.set_shader_input('ssr_depth_cutoff', 0.52)
             base.screen_quad.set_shader_input('ssr_depth_min', 0.49)
-            base.screen_quad.set_shader_input('ssao_samples', 2)
+            base.screen_quad.set_shader_input('ssao_radius', 0.5)  # new input as of complexpbr 0.6.4
+            base.screen_quad.set_shader_input('ssao_bias', 0.001)
+            base.screen_quad.set_shader_input('ssao_samples', 0)  # 32
             base.screen_quad.set_shader_input('hsv_r', 1.0)
             base.screen_quad.set_shader_input('hsv_g', 1.1)
             base.screen_quad.set_shader_input('hsv_b', 1.0)

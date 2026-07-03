@@ -110,7 +110,9 @@ class app(ShowBase):
             base.screen_quad.set_shader_input('ssr_samples', 1)  # determines total steps
             base.screen_quad.set_shader_input('ssr_depth_cutoff', 0.52)
             base.screen_quad.set_shader_input('ssr_depth_min', 0.49)
-            base.screen_quad.set_shader_input('ssao_samples', 2)
+            base.screen_quad.set_shader_input('ssao_radius', 0.5)  # new input as of complexpbr 0.6.4
+            base.screen_quad.set_shader_input('ssao_bias', 0.001)
+            base.screen_quad.set_shader_input('ssao_samples', 0)  # 32
             base.screen_quad.set_shader_input('hsv_r', 1.0)
             base.screen_quad.set_shader_input('hsv_g', 1.1)
             base.screen_quad.set_shader_input('hsv_b', 1.0)

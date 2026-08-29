@@ -282,7 +282,7 @@ class app(ShowBase):
         self.accept("gamepad-face_a", print_player_pos)
 
         # add a few random physics spheres
-        for x in range(0, 80):
+        for x in range(0, 40):
             # dynamic collision
             random_vec = Vec3(1.04, 1.04, 1.04)
             # special_shape = BulletBoxShape(random_vec)

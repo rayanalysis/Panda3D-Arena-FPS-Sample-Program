@@ -49,12 +49,12 @@ def lighting():
 def init_flashlight():
     base.slight = Spotlight('flashlight')
     # base.slight.setShadowCaster(True, 512, 512)
-    base.slight.set_color(VBase4(5.5, 5.6, 5.6, 1))  # slightly bluish
+    base.slight.set_color(VBase4(2.5, 2.6, 2.6, 1))  # slightly bluish
     lens = PerspectiveLens()
-    lens.set_near_far(0.5, 500)
+    lens.set_near_far(0.5, 20)
     base.slight.set_lens(lens)
     base.slight.set_attenuation((0.5, 0, 0.0005))
-    base.slight.get_lens().set_fov(35)
+    base.slight.get_lens().set_fov(1)
     base.slight = base.render.attach_new_node(base.slight)
     # base.render.set_light(base.slight)
     base.slight.reparent_to(base.cam)

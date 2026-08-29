@@ -48,6 +48,7 @@ class app(ShowBase):
         
         for x in base.complexpbr_map.find_all_matches('**/+Camera'):
             x.node().get_lens().set_near_far(0.01, 3000)
+            x.node().set_camera_mask(BitMask32.bit(1))
             
         base.complexpbr_map_2 = NodePath('cuberig_2')
         base.complexpbr_map_2.reparent_to(base.render)
@@ -67,29 +68,43 @@ class app(ShowBase):
         def quality_mode():
             complexpbr.screenspace_init()
         
-            base.screen_quad.set_shader_input("bloom_intensity", 0.25)
+            base.screen_quad.set_shader_input("bloom_intensity", 0.45)
             base.screen_quad.set_shader_input("bloom_threshold", 0.3)
-            base.screen_quad.set_shader_input("bloom_blur_width", 20)
-            base.screen_quad.set_shader_input("bloom_samples", 2)
+            base.screen_quad.set_shader_input("bloom_blur_width", 25)
+            base.screen_quad.set_shader_input("bloom_samples", 4)
             base.screen_quad.set_shader_input('ssr_intensity', 2.0)
-            base.screen_quad.set_shader_input('reflection_threshold', 1.6)  # subtracts from intensity
+            base.screen_quad.set_shader_input('reflection_threshold', 1.6)  # subtracts from ssr_intensity
             base.screen_quad.set_shader_input('ssr_step', 5.75)  # helps determine reflect height
             base.screen_quad.set_shader_input('screen_ray_factor', 0.06)  # detail factor
             base.screen_quad.set_shader_input('ssr_samples', 1)  # determines total steps
             base.screen_quad.set_shader_input('ssr_depth_cutoff', 0.52)
             base.screen_quad.set_shader_input('ssr_depth_min', 0.49)
-            base.screen_quad.set_shader_input('ssao_radius', 0.5)  # new input as of complexpbr 0.6.4
-            base.screen_quad.set_shader_input('ssao_bias', 0.001)
-            base.screen_quad.set_shader_input('ssao_samples', 0)  # 32
+            base.screen_quad.set_shader_input('ssao_samples', 0)
+            base.screen_quad.set_shader_input('ssao_radius', 0)
+            base.screen_quad.set_shader_input('ssao_bias', 0)
+            base.screen_quad.set_shader_input('ssao_intensity', 0)
             base.screen_quad.set_shader_input('hsv_r', 1.0)
             base.screen_quad.set_shader_input('hsv_g', 1.1)
             base.screen_quad.set_shader_input('hsv_b', 1.0)
-            base.screen_quad.set_shader_input('final_brightness', 1.3)
+            base.screen_quad.set_shader_input('final_brightness', 1.2)
+            # the following call has a soft requirement of complexpbr-0.6.7 or higher
+            complexpbr.smooth_ssao(ssao_samples=128,ssao_radius=0.4,ssao_bias=0.05,ssao_intensity=0.9,ssao_step_time=0.2)
 
             text_1.set_text("Quality Mode: On")
 
         self.accept_once('m', quality_mode)
         self.accept_once("gamepad-face_y", quality_mode)
+        
+        def remove_ssao():
+            complexpbr.remove_smooth_ssao()
+            
+        self.accept('k', remove_ssao)
+        
+        def restart_ssao():
+            complexpbr.remove_smooth_ssao()
+            complexpbr.smooth_ssao(ssao_samples=128,ssao_radius=0.4,ssao_bias=0.05,ssao_intensity=0.98,ssao_step_time=0.2)
+            
+        self.accept('i', restart_ssao)
 
         def save_screen():
             base.screenshot('arena_screen')
@@ -189,6 +204,7 @@ class app(ShowBase):
         arena_1.reparent_to(self.render)
         arena_1.set_pos(0, 0, 0)
         # arena_1.flatten_strong()
+        arena_1.set_shader_input('shadow_boost', 0.3)
         try:
             # we're using the secondary cubemap buffer cube_buffer_2 to render onto the floor
             # using the existing cubemaptex texture input already supplied by complexpbr
@@ -205,6 +221,7 @@ class app(ShowBase):
         player_np = self.render.attach_new_node(player_node)
         player_np.set_pos(-20, -10, 30)
         player_np.set_collide_mask(BitMask32.allOn())
+        player_np.hide(BitMask32.bit(1))
         self.world.attach_character(player_np.node())
         # cast player_np to self.player
         self.player = player_np

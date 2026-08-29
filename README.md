@@ -33,15 +33,12 @@ This is a modern Panda3D sample program with an Arena first person shooter envir
 - panda3d
 - panda3d-complexpbr
 
-## Screenshots
-![arena_screen-Sun-Jun-25-16-17-28-2023-6262](https://github.com/rayanalysis/Panda3D-Arena-FPS-Sample-Program/assets/3117958/1f89e6e5-2221-41df-ad13-2fdc8a03200a)
+## Screenshots (updated August 28th, 2026)
+<img width="1280" height="720" alt="npc_arena_screen-Fri-Aug-28-21-01-15-2026-778" src="https://github.com/user-attachments/assets/04aa4b3f-974e-47fc-9a81-0a3980284c86" />
 
-![arena_screen-Sun-Jun-25-16-11-44-2023-432](https://github.com/rayanalysis/Panda3D-Arena-FPS-Sample-Program/assets/3117958/9e91f710-bf5f-4317-a1cc-d094c33c2a4d)
+<img width="1280" height="720" alt="wood_sphere_arena_screen-Fri-Aug-28-21-15-49-2026-10302" src="https://github.com/user-attachments/assets/ab1cc4d9-74a8-485a-80fe-2c6601d0a392" />
 
-![arena_screen-Sun-Jun-25-16-13-14-2023-1934](https://github.com/rayanalysis/Panda3D-Arena-FPS-Sample-Program/assets/3117958/13614ca2-2b2d-4a3d-93d1-50812426f257)
+<img width="1280" height="720" alt="mirror_demo_arena_screen-Fri-Aug-28-22-05-03-2026-1963" src="https://github.com/user-attachments/assets/c9f0bd23-ba4a-4e67-97d1-bfd4bf4e07cc" />
 
-![arena_screen-Sun-Jun-25-16-13-49-2023-2504](https://github.com/rayanalysis/Panda3D-Arena-FPS-Sample-Program/assets/3117958/ddc7c84a-103b-46ac-bc44-41cf1a6308f0)
-
-![arena_screen-Sun-Jun-25-16-13-58-2023-2659](https://github.com/rayanalysis/Panda3D-Arena-FPS-Sample-Program/assets/3117958/84e64bec-d21d-48e3-be85-f7c94107b6dd)
 
 

@@ -85,7 +85,6 @@ class app(ShowBase):
         self.accept('k', remove_ssao)
         
         def restart_ssao():
-            complexpbr.remove_smooth_ssao()
             complexpbr.smooth_ssao(ssao_samples=128,ssao_radius=0.4,ssao_bias=0.05,ssao_intensity=0.98,ssao_step_time=0.2)
             
         self.accept('i', restart_ssao)
